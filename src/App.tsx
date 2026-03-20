@@ -7,7 +7,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, 
   User, UserPlus, ExternalLink, Calendar, Ruler, Weight, Activity,
-  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2, RefreshCcw
+  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2, RefreshCcw,
+  Facebook, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
@@ -28,8 +29,8 @@ const ADVICE_TEXTS = {
   fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。",
   underweight: "【體重過輕建議】\n建議增加營養攝取，特別是優質蛋白質與健康油脂。若伴隨食慾不振，可考慮中醫調理脾胃，並排除寄生蟲或吸收不良等因素。",
   overweight: "【體重過重建議】\n建議調整飲食結構，減少高糖、高油與加工食品。增加戶外運動量，並監測是否有代謝異常或性早熟風險。建議諮詢醫師或營養師進行體重管理。",
-  genetic_fast: "【生長超前建議】\n目前生長進度大幅超越遺傳目標身高，這可能是「性早熟」的徵兆。建議監測骨齡，確認生長板是否提早閉合，並減少環境荷爾蒙接觸。若身高突然衝高但伴隨第二性徵出現，請務必諮詢專業醫師。",
-  genetic_slow: "【生長落後建議】\n目前生長進度顯著落後於遺傳目標身高。建議加強脾胃調理，確保優質蛋白質攝取，並維持充足睡眠（晚上10點前入睡）。若百分位持續下滑，建議諮詢小兒內分泌科醫師排除生長激素不足或其他生理因素。"
+  genetic_fast: "【生長超前建議】\n目前生長百分位大幅超越遺傳目標身高，這可能是「性早熟」的徵兆。建議監測骨齡，確認生長板是否提早閉合，並減少環境荷爾蒙接觸。若身高突然衝高但伴隨第二性徵出現，請務必諮詢專業醫師。",
+  genetic_slow: "【生長落後建議】\n目前生長百分位顯著落後於遺傳目標身高。建議加強脾胃調理，確保優質蛋白質攝取，並維持充足睡眠（晚上10點前入睡）。若百分位持續下滑，建議諮詢小兒內分泌科醫師排除生長激素不足或其他生理因素。"
 };
 
 export default function App() {
@@ -126,8 +127,8 @@ export default function App() {
     return (
       <div className="space-y-1.5">
         <div className="flex justify-between items-end">
-          <span className="text-[10px] font-bold text-ink/40 uppercase tracking-widest">{label}</span>
-          <span className={`text-[10px] font-black ${isExtreme ? 'text-red-500' : 'text-accent'}`}>
+          <span className="text-xs font-bold text-ink/40 uppercase tracking-widest">{label}</span>
+          <span className={`text-xs font-black ${isExtreme ? 'text-red-500' : 'text-accent'}`}>
             {percentile < 3 ? '< 3rd' : percentile > 97 ? '> 97th' : `${percentile.toFixed(1)}%`}
           </span>
         </div>
@@ -362,10 +363,10 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
         <AnimatePresence>
           {needUpdate && (
             <motion.div 
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-accent rounded-3xl p-5 shadow-xl shadow-accent/20 flex items-center justify-between gap-4 text-white max-w-md mx-auto lg:max-w-none"
+              exit={{ opacity: 0, y: 50 }}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-40px)] max-w-md bg-accent rounded-3xl p-5 shadow-2xl shadow-accent/40 flex items-center justify-between gap-4 text-white"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
@@ -373,43 +374,62 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                 </div>
                 <div>
                   <p className="text-sm font-bold">發現新版本</p>
-                  <p className="text-[10px] opacity-80">點擊按鈕立即更新至最新功能</p>
+                  <p className="text-xs opacity-80">點擊按鈕立即更新至最新功能</p>
                 </div>
               </div>
-              <button 
-                onClick={() => updateServiceWorker(true)}
-                className="bg-white text-[#D4A373] px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg active:scale-95 transition-transform"
-              >
-                立即更新
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => updateServiceWorker(true)}
+                  className="bg-white text-accent px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg active:scale-95 transition-transform"
+                >
+                  立即更新
+                </button>
+                <button 
+                  onClick={() => setNeedUpdate(false)}
+                  className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* PWA Install Banner */}
-        {showInstallBanner && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-accent rounded-3xl p-5 shadow-xl shadow-accent/20 flex items-center justify-between gap-4 text-white max-w-md mx-auto lg:max-w-none"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <Download size={24} />
-              </div>
-              <div>
-                <p className="text-sm font-bold">安裝至主畫面</p>
-                <p className="text-[10px] opacity-80">隨時追蹤，離線也能使用</p>
-              </div>
-            </div>
-            <button 
-              onClick={handleInstallClick}
-              className="bg-white text-[#D4A373] px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg active:scale-95 transition-transform"
+        <AnimatePresence>
+          {showInstallBanner && !needUpdate && (
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-40px)] max-w-md bg-accent rounded-3xl p-5 shadow-2xl shadow-accent/40 flex items-center justify-between gap-4 text-white"
             >
-              立即安裝
-            </button>
-          </motion.div>
-        )}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                  <Download size={24} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold">安裝至主畫面</p>
+                  <p className="text-xs opacity-80">隨時追蹤，離線也能使用</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleInstallClick}
+                  className="bg-white text-accent px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg active:scale-95 transition-transform"
+                >
+                  立即安裝
+                </button>
+                <button 
+                  onClick={() => setShowInstallBanner(false)}
+                  className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -419,7 +439,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
             <div className="glass-card rounded-[40px] p-8 space-y-8">
               {/* Gender Selection */}
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] ml-2">選擇性別</label>
+                <label className="text-xs font-black text-ink/30 uppercase tracking-[0.3em] ml-2">選擇性別</label>
                 <div className="flex p-2 bg-bg rounded-[28px] gap-2">
                   <button 
                     onClick={() => setGender('boy')}
@@ -440,8 +460,8 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
               <div className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between ml-2">
-                    <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em]">生日或年齡</label>
-                    <span className="text-[10px] text-accent font-black uppercase tracking-widest">YYYYMMDD</span>
+                    <label className="text-xs font-black text-ink/30 uppercase tracking-[0.3em]">生日或年齡</label>
+                    <span className="text-xs text-accent font-black uppercase tracking-widest">YYYYMMDD</span>
                   </div>
                   <div className="relative group">
                     <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent group-focus-within:scale-110 transition-transform">
@@ -459,7 +479,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
 
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] ml-2">目前身高 (cm)</label>
+                    <label className="text-xs font-black text-ink/30 uppercase tracking-[0.3em] ml-2">目前身高 (cm)</label>
                     <div className="relative group">
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent">
                         <Ruler size={20} />
@@ -475,7 +495,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] ml-2">目前體重 (kg)</label>
+                    <label className="text-xs font-black text-ink/30 uppercase tracking-[0.3em] ml-2">目前體重 (kg)</label>
                     <div className="relative group">
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent">
                         <Weight size={20} />
@@ -501,7 +521,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                 >
                   <div className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full transition-colors ${showParents ? 'bg-accent' : 'bg-ink/20'}`} />
-                    <span className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] group-hover:text-accent transition-colors">父母身高 (選填)</span>
+                    <span className="text-xs font-black text-ink/30 uppercase tracking-[0.3em] group-hover:text-accent transition-colors">父母身高 (選填)</span>
                   </div>
                   <div className={`w-8 h-8 rounded-2xl bg-bg flex items-center justify-center text-accent transition-all ${showParents ? 'rotate-180 bg-accent text-white' : ''}`}>
                     <ChevronDown size={16} />
@@ -518,7 +538,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                     >
                       <div className="grid grid-cols-2 gap-5 pt-6">
                         <div className="space-y-3">
-                          <label className="text-[10px] font-black text-ink/40 uppercase tracking-widest ml-2 text-center block">爸爸身高 (cm)</label>
+                          <label className="text-xs font-black text-ink/40 uppercase tracking-widest ml-2 text-center block">爸爸身高 (cm)</label>
                           <input 
                             type="number"
                             step="0.1"
@@ -528,7 +548,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                           />
                         </div>
                         <div className="space-y-3">
-                          <label className="text-[10px] font-black text-ink/40 uppercase tracking-widest ml-2 text-center block">媽媽身高 (cm)</label>
+                          <label className="text-xs font-black text-ink/40 uppercase tracking-widest ml-2 text-center block">媽媽身高 (cm)</label>
                           <input 
                             type="number"
                             step="0.1"
@@ -610,16 +630,16 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             {gender === 'boy' ? '👦' : '👧'}
                           </motion.div>
                           <div>
-                            <p className={`text-lg font-black tracking-tight ${gender === 'boy' ? 'text-boy' : 'text-girl'}`}>
+                            <p className={`text-xl font-black tracking-tight ${gender === 'boy' ? 'text-boy' : 'text-girl'}`}>
                               {gender === 'boy' ? '男孩' : '女孩'}
                             </p>
-                            <p className="text-xs font-bold text-ink/50">{ageData?.display}</p>
+                            <p className="text-sm font-bold text-ink/50">{ageData?.display}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] font-black text-ink/30 uppercase tracking-[0.2em]">BMI 指數</p>
-                          <p className="text-2xl font-black text-ink font-display">{results.bmi}</p>
-                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black mt-1 ${
+                          <p className="text-xs font-black text-ink/30 uppercase tracking-[0.2em]">BMI 指數</p>
+                          <p className="text-3xl font-black text-ink font-display">{results.bmi}</p>
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black mt-1 ${
                             results.bmiCategory === '正常' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
                           }`}>
                             {results.bmiCategory === '正常' && <CheckCircle2 size={10} />}
@@ -635,25 +655,25 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${gender === 'boy' ? 'bg-boy-soft text-boy' : 'bg-girl-soft text-girl'}`}>
                               <Ruler size={16} />
                             </div>
-                            <span className="text-[10px] font-black text-ink/30 uppercase tracking-widest">身高</span>
+                            <span className="text-xs font-black text-ink/30 uppercase tracking-widest">身高</span>
                           </div>
                           <div className="space-y-1">
                             {(() => {
                               const { text, isExtreme } = formatPercentile(results.hRes.percentile);
                               return (
                                 <div className="flex items-baseline gap-1">
-                                  <p className={`text-3xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
+                                  <p className={`text-4xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
                                     {text.replace('%', '')}
                                   </p>
-                                  {!isExtreme && <span className="text-xs font-bold text-ink/40">%</span>}
+                                  {!isExtreme && <span className="text-sm font-bold text-ink/40">%</span>}
                                 </div>
                               );
                             })()}
-                            <p className="text-xs font-bold text-ink/40">{height} cm</p>
+                            <p className="text-sm font-bold text-ink/40">{height} cm</p>
                           </div>
                           <GrowthProgressBar 
                             percentile={results.hRes.percentile} 
-                            label="生長進度" 
+                            label="生長百分位" 
                             color={gender === 'boy' ? 'bg-boy' : 'bg-girl'} 
                           />
                         </div>
@@ -663,25 +683,25 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             <div className="w-8 h-8 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500">
                               <Weight size={16} />
                             </div>
-                            <span className="text-[10px] font-black text-ink/30 uppercase tracking-widest">體重</span>
+                            <span className="text-xs font-black text-ink/30 uppercase tracking-widest">體重</span>
                           </div>
                           <div className="space-y-1">
                             {(() => {
                               const { text, isExtreme } = formatPercentile(results.wRes.percentile);
                               return (
                                 <div className="flex items-baseline gap-1">
-                                  <p className={`text-3xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
+                                  <p className={`text-4xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
                                     {text.replace('%', '')}
                                   </p>
-                                  {!isExtreme && <span className="text-xs font-bold text-ink/40">%</span>}
+                                  {!isExtreme && <span className="text-sm font-bold text-ink/40">%</span>}
                                 </div>
                               );
                             })()}
-                            <p className="text-xs font-bold text-ink/40">{weight} kg</p>
+                            <p className="text-sm font-bold text-ink/40">{weight} kg</p>
                           </div>
                           <GrowthProgressBar 
                             percentile={results.wRes.percentile} 
-                            label="重量進度" 
+                            label="重量百分位" 
                             color="bg-orange-500" 
                           />
                         </div>
@@ -699,7 +719,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                               <Info size={20} />
                             </div>
                             <div className="space-y-1.5 flex-1">
-                              <p className="text-xs font-bold text-ink leading-relaxed">
+                              <p className="text-sm font-bold text-ink leading-relaxed">
                                 {results.geneticComparison}
                               </p>
                               {results.geneticPercentile !== null && (
@@ -750,7 +770,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <div>
                               <p className="text-sm font-black text-red-900">發育狀態提醒</p>
-                              <p className="text-[10px] text-red-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                              <p className="text-xs text-red-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
                             </div>
                           </div>
                           <ArrowRight size={18} className="text-red-400 group-hover:translate-x-1 transition-transform" />
@@ -769,7 +789,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <div>
                               <p className="text-sm font-black text-orange-900">體位狀態提醒</p>
-                              <p className="text-[10px] text-orange-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                              <p className="text-xs text-orange-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
                             </div>
                           </div>
                           <ArrowRight size={18} className="text-orange-400 group-hover:translate-x-1 transition-transform" />
@@ -788,7 +808,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <div>
                               <p className="text-sm font-black text-amber-900 leading-tight">生長軌跡與遺傳目標偏差提醒</p>
-                              <p className="text-[10px] text-amber-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                              <p className="text-xs text-amber-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
                             </div>
                           </div>
                           <ArrowRight size={18} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
@@ -808,13 +828,13 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                       
                       <div className="relative z-10 flex items-center justify-between">
                         <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">預估成年身高</p>
+                          <p className="text-xs font-black uppercase tracking-[0.3em] opacity-70">預估成年身高</p>
                           <p className="text-4xl font-black tracking-tighter font-display">{inherited.median.toFixed(1)} <span className="text-lg font-bold">cm</span></p>
                           <div className="flex items-center gap-2 mt-2 opacity-80">
                             <div className="h-1 w-12 bg-white/30 rounded-full overflow-hidden">
                               <div className="h-full bg-white w-2/3" />
                             </div>
-                            <p className="text-[10px] font-bold">遺傳範圍：{inherited.min.toFixed(1)} - {inherited.max.toFixed(1)}</p>
+                            <p className="text-xs font-bold">遺傳範圍：{inherited.min.toFixed(1)} - {inherited.max.toFixed(1)}</p>
                           </div>
                         </div>
                         <div className="w-20 h-20 bg-white/20 rounded-[32px] flex items-center justify-center backdrop-blur-md shadow-lg">
@@ -834,7 +854,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                         <div className="w-10 h-10 bg-bg rounded-2xl flex items-center justify-center text-accent">
                           <Info size={20} />
                         </div>
-                        <span className="text-sm font-black text-ink">查看同年齡 50% 標準值</span>
+                        <span className="text-sm font-black text-ink">查看 50 百分位</span>
                       </div>
                       <div className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-all ${showMedian ? 'bg-accent text-white rotate-180' : 'bg-bg text-ink/30'}`}>
                         <ChevronDown size={16} />
@@ -850,11 +870,11 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                         >
                           <div className="grid grid-cols-2 gap-5 pt-2">
                             <div className="bg-bg p-5 rounded-[24px] border border-line/30">
-                              <p className="text-[10px] font-black text-ink/30 uppercase tracking-[0.2em] mb-2">身高標準</p>
+                              <p className="text-xs font-black text-ink/30 uppercase tracking-[0.2em] mb-2">身高 50 百分位</p>
                               <p className="text-xl font-black text-ink font-display">{results.hRes.p50.toFixed(1)} <span className="text-xs font-bold text-ink/40">cm</span></p>
                             </div>
                             <div className="bg-bg p-5 rounded-[24px] border border-line/30">
-                              <p className="text-[10px] font-black text-ink/30 uppercase tracking-[0.2em] mb-2">體重標準</p>
+                              <p className="text-xs font-black text-ink/30 uppercase tracking-[0.2em] mb-2">體重 50 百分位</p>
                               <p className="text-xl font-black text-ink font-display">{results.wRes.p50.toFixed(1)} <span className="text-xs font-bold text-ink/40">kg</span></p>
                             </div>
                           </div>
@@ -957,10 +977,25 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
               <Heart className="text-white" size={22} fill="currentColor" />
             </motion.div>
             <div>
-              <h1 className="text-lg font-black text-ink tracking-tight leading-none font-display">
-                台灣兒童生長曲線小幫手
-              </h1>
-              <p className="text-[10px] text-ink/40 font-bold tracking-tight mt-1">專業、精確的成長評估工具</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-black text-ink tracking-tight leading-none font-display">
+                  台灣兒童生長曲線小幫手
+                </h1>
+                <span className="text-[9px] font-black bg-accent/10 text-accent px-1.5 py-0.5 rounded-md uppercase tracking-tighter">2026/03.20 v3.0</span>
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                <p className="text-xs text-ink/40 font-bold tracking-tight">專業、精確的成長評估工具</p>
+                <div className="w-px h-2 bg-line/50" />
+                <a 
+                  href="https://www.facebook.com/profile.php?id=61557246475372" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs font-black text-accent hover:opacity-70 transition-opacity"
+                >
+                  <Facebook size={10} fill="currentColor" />
+                  仨寶爸中醫博士吳啓銘
+                </a>
+              </div>
             </div>
           </div>
           <button 
