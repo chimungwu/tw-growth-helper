@@ -218,14 +218,22 @@ export default function App() {
     return calculateInheritedHeight(gender, parseFloat(fatherHeight), parseFloat(motherHeight));
   }, [gender, fatherHeight, motherHeight]);
 
+  const formatPercentile = (p: number) => {
+    if (p < 3) return { text: '< 3rd', isExtreme: true };
+    if (p > 97) return { text: '> 97th', isExtreme: true };
+    return { text: `${p.toFixed(1)}%`, isExtreme: false };
+  };
+
   const copyResults = () => {
     if (!results || !ageData) return;
+    const hP = formatPercentile(results.hRes.percentile).text;
+    const wP = formatPercentile(results.wRes.percentile).text;
     const text = `
 【台灣兒童生長曲線小幫手】
 性別：${gender === 'boy' ? '男孩' : '女孩'}
 年齡：${ageData.display}
-身高：${height} cm (百分位: ${results.hRes.percentile.toFixed(1)})
-體重：${weight} kg (百分位: ${results.wRes.percentile.toFixed(1)})
+身高：${height} cm (百分位: ${hP})
+體重：${weight} kg (百分位: ${wP})
 BMI：${results.bmi} (${results.bmiCategory})
 ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherited.min.toFixed(1)} - ${inherited.max.toFixed(1)})` : ''}
 日期：${new Date().toLocaleDateString('zh-TW')}
@@ -242,8 +250,10 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
 
   const exportCSV = () => {
     if (!results || !ageData) return;
+    const hP = formatPercentile(results.hRes.percentile).text;
+    const wP = formatPercentile(results.wRes.percentile).text;
     const headers = "\uFEFF日期,性別,年齡,身高(cm),身高百分位,體重(kg),體重百分位,BMI,BMI判定\n";
-    const row = `${new Date().toLocaleDateString('zh-TW')},${gender === 'boy' ? '男' : '女'},${ageData.display},${height},${results.hRes.percentile.toFixed(1)},${weight},${results.wRes.percentile.toFixed(1)},${results.bmi},${results.bmiCategory}\n`;
+    const row = `${new Date().toLocaleDateString('zh-TW')},${gender === 'boy' ? '男' : '女'},${ageData.display},${height},${hP},${weight},${wP},${results.bmi},${results.bmiCategory}\n`;
     
     const blob = new Blob([headers + row], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -338,18 +348,32 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/50 p-3 rounded-2xl">
-                    <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">身高百分位</p>
-                    <p className="text-2xl font-black text-[#1E3A8A]">{results.hRes.percentile.toFixed(1)}%</p>
-                    <p className="text-[10px] text-[#5B7CB2] mt-1">{height} cm</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/50 p-3 rounded-2xl">
+                      <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">身高百分位</p>
+                      {(() => {
+                        const { text, isExtreme } = formatPercentile(results.hRes.percentile);
+                        return (
+                          <p className={`text-2xl font-black ${isExtreme ? 'text-[#EF4444]' : 'text-[#1E3A8A]'}`}>
+                            {text}
+                          </p>
+                        );
+                      })()}
+                      <p className="text-[10px] text-[#5B7CB2] mt-1">{height} cm</p>
+                    </div>
+                    <div className="bg-white/50 p-3 rounded-2xl">
+                      <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">體重百分位</p>
+                      {(() => {
+                        const { text, isExtreme } = formatPercentile(results.wRes.percentile);
+                        return (
+                          <p className={`text-2xl font-black ${isExtreme ? 'text-[#EF4444]' : 'text-[#1E3A8A]'}`}>
+                            {text}
+                          </p>
+                        );
+                      })()}
+                      <p className="text-[10px] text-[#5B7CB2] mt-1">{weight} kg</p>
+                    </div>
                   </div>
-                  <div className="bg-white/50 p-3 rounded-2xl">
-                    <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">體重百分位</p>
-                    <p className="text-2xl font-black text-[#1E3A8A]">{results.wRes.percentile.toFixed(1)}%</p>
-                    <p className="text-[10px] text-[#5B7CB2] mt-1">{weight} kg</p>
-                  </div>
-                </div>
 
                 <div className="bg-white/80 p-4 rounded-2xl text-center">
                   <p className="text-sm font-bold text-[#1E3A8A]">
@@ -361,7 +385,9 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                   <div className="bg-white/50 p-3 rounded-2xl text-center">
                     <p className="text-xs font-bold text-[#1E3A8A]">{results.geneticComparison}</p>
                     {results.geneticPercentile !== null && (
-                      <p className="text-[10px] text-[#5B7CB2] mt-0.5">遺傳百分位: {results.geneticPercentile.toFixed(1)}%</p>
+                      <p className="text-[10px] text-[#5B7CB2] mt-0.5">
+                        遺傳百分位: {formatPercentile(results.geneticPercentile).text}
+                      </p>
                     )}
                   </div>
                 )}
