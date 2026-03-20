@@ -7,9 +7,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, 
   User, UserPlus, ExternalLink, Calendar, Ruler, Weight, Activity,
-  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2
+  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2, RefreshCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 import { 
   boyWeightData, boyHeightData, girlWeightData, girlHeightData 
 } from './data/growthData';
@@ -32,6 +33,19 @@ const ADVICE_TEXTS = {
 };
 
 export default function App() {
+  const {
+    offlineReady: [offlineReady, setOfflineReady],
+    needRefresh: [needUpdate, setNeedUpdate],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log('SW Registered: ' + r);
+    },
+    onRegisterError(error) {
+      console.log('SW registration error', error);
+    },
+  });
+
   const [gender, setGender] = useState<Gender>('boy');
   const [birthdateInput, setBirthdateInput] = useState('');
   const [height, setHeight] = useState<string>('');
@@ -344,6 +358,34 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
       />
       
       <main className="max-w-6xl mx-auto px-5 mt-6 space-y-8">
+        {/* PWA Update Prompt */}
+        <AnimatePresence>
+          {needUpdate && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-accent rounded-3xl p-5 shadow-xl shadow-accent/20 flex items-center justify-between gap-4 text-white max-w-md mx-auto lg:max-w-none"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                  <RefreshCcw size={24} className="animate-spin-slow" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold">發現新版本</p>
+                  <p className="text-[10px] opacity-80">點擊按鈕立即更新至最新功能</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => updateServiceWorker(true)}
+                className="bg-white text-[#D4A373] px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg active:scale-95 transition-transform"
+              >
+                立即更新
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* PWA Install Banner */}
         {showInstallBanner && (
           <motion.div 
