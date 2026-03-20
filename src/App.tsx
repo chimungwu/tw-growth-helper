@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, 
   User, UserPlus, ExternalLink, Calendar, Ruler, Weight, Activity,
-  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2, RefreshCcw,
+  Info, Heart, Share2, Trash2, ArrowRight, ArrowLeft, CheckCircle2, RefreshCcw, Target,
   Facebook, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -122,27 +122,40 @@ export default function App() {
     });
   };
 
-  const GrowthProgressBar = ({ percentile, label, color }: { percentile: number, label: string, color: string }) => {
-    const isExtreme = percentile < 3 || percentile > 97;
+  const GeneticDeviationIndicator = ({ currentPercentile, targetPercentile }: { currentPercentile: number; targetPercentile: number }) => {
+    const diff = currentPercentile - targetPercentile;
+    const clampedDiff = Math.max(-30, Math.min(30, diff));
+    const markerPosition = ((clampedDiff + 30) / 60) * 100;
+    const isAlert = Math.abs(diff) > 15;
+    const directionLabel = diff > 2 ? '高於目標' : diff < -2 ? '低於目標' : '接近目標';
+    const directionColor = diff > 2 ? 'text-rose-600' : diff < -2 ? 'text-blue-600' : 'text-emerald-600';
+
     return (
-      <div className="space-y-1.5">
-        <div className="flex justify-between items-end">
-          <span className="text-xs font-bold text-ink/40 uppercase tracking-widest">{label}</span>
-          <span className={`text-xs font-black ${isExtreme ? 'text-red-500' : 'text-accent'}`}>
-            {percentile < 3 ? '< 3rd' : percentile > 97 ? '> 97th' : `${percentile.toFixed(1)}%`}
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-ink/40 uppercase tracking-widest">遺傳偏離程度</span>
+          <span className={`text-xs font-black ${directionColor}`}>
+            {diff >= 0 ? '+' : ''}{diff.toFixed(1)}%
           </span>
         </div>
-        <div className="h-1.5 w-full bg-line/30 rounded-full overflow-hidden relative">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${percentile}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className={`h-full rounded-full ${color}`}
-          />
-          {/* Reference markers */}
-          <div className="absolute top-0 left-[3%] h-full w-px bg-white/50" />
-          <div className="absolute top-0 left-[50%] h-full w-px bg-white/50" />
-          <div className="absolute top-0 left-[97%] h-full w-px bg-white/50" />
+        <div className="relative h-2.5 rounded-full bg-gradient-to-r from-blue-100 via-emerald-100 to-rose-100 overflow-hidden">
+          <div className="absolute inset-y-0 left-1/2 w-px bg-ink/30" />
+          <div
+            className={`absolute -top-1.5 w-5 h-5 rounded-full border-2 shadow-sm flex items-center justify-center ${
+              isAlert ? 'bg-red-500 border-red-200 text-white' : 'bg-accent border-white text-white'
+            }`}
+            style={{ left: `calc(${markerPosition}% - 10px)` }}
+          >
+            <Target size={10} />
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-[11px] font-bold text-ink/50">
+          <span className="inline-flex items-center gap-1"><ArrowLeft size={12} />落後較多</span>
+          <span className="text-ink/70">遺傳目標</span>
+          <span className="inline-flex items-center gap-1">超前較多<ArrowRight size={12} /></span>
+        </div>
+        <div className={`text-xs font-bold ${directionColor}`}>
+          {directionLabel}（目前 {currentPercentile.toFixed(1)}% / 目標 {targetPercentile.toFixed(1)}%）
         </div>
       </div>
     );
@@ -657,25 +670,20 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <span className="text-xs font-black text-ink/30 uppercase tracking-widest">身高</span>
                           </div>
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             {(() => {
                               const { text, isExtreme } = formatPercentile(results.hRes.percentile);
                               return (
-                                <div className="flex items-baseline gap-1">
+                                <div className="space-y-1">
                                   <p className={`text-4xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
-                                    {text.replace('%', '')}
+                                    {text}
                                   </p>
-                                  {!isExtreme && <span className="text-sm font-bold text-ink/40">%</span>}
+                                  <p className="text-xs font-black text-ink/35 uppercase tracking-wider">身高百分位</p>
                                 </div>
                               );
                             })()}
                             <p className="text-sm font-bold text-ink/40">{height} cm</p>
                           </div>
-                          <GrowthProgressBar 
-                            percentile={results.hRes.percentile} 
-                            label="生長百分位" 
-                            color={gender === 'boy' ? 'bg-boy' : 'bg-girl'} 
-                          />
                         </div>
 
                         <div className="bento-item space-y-4">
@@ -685,25 +693,20 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <span className="text-xs font-black text-ink/30 uppercase tracking-widest">體重</span>
                           </div>
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             {(() => {
                               const { text, isExtreme } = formatPercentile(results.wRes.percentile);
                               return (
-                                <div className="flex items-baseline gap-1">
+                                <div className="space-y-1">
                                   <p className={`text-4xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
-                                    {text.replace('%', '')}
+                                    {text}
                                   </p>
-                                  {!isExtreme && <span className="text-sm font-bold text-ink/40">%</span>}
+                                  <p className="text-xs font-black text-ink/35 uppercase tracking-wider">體重百分位</p>
                                 </div>
                               );
                             })()}
                             <p className="text-sm font-bold text-ink/40">{weight} kg</p>
                           </div>
-                          <GrowthProgressBar 
-                            percentile={results.wRes.percentile} 
-                            label="重量百分位" 
-                            color="bg-orange-500" 
-                          />
                         </div>
                       </div>
 
@@ -724,10 +727,9 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                               </p>
                               {results.geneticPercentile !== null && (
                                 <div className="pt-2">
-                                  <GrowthProgressBar 
-                                    percentile={results.geneticPercentile} 
-                                    label="遺傳目標百分位" 
-                                    color="bg-accent" 
+                                  <GeneticDeviationIndicator
+                                    currentPercentile={results.hRes.percentile}
+                                    targetPercentile={results.geneticPercentile}
                                   />
                                 </div>
                               )}
