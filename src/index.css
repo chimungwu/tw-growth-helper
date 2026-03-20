@@ -4,28 +4,32 @@
   --font-sans: "Inter", "Noto Sans TC", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", sans-serif;
   
-  --color-bg: #F1F5F9;
-  --color-ink: #0F172A;
-  --color-ink-muted: #475569;
-  --color-accent: #2563EB;
-  --color-accent-soft: #DBEAFE;
-  --color-line: #CBD5E1;
+  --color-bg: #FDF8F3;
+  --color-ink: #4A443F;
+  --color-ink-muted: #8B8279;
+  --color-accent: #D4A373;
+  --color-accent-soft: #E9D5C3;
+  --color-line: #E8E2DC;
   
-  --color-boy: #0284C7;
-  --color-boy-soft: #E0F2FE;
-  --color-girl: #DB2777;
-  --color-girl-soft: #FCE7F3;
+  --color-boy: #7FB3D5;
+  --color-boy-soft: #EBF5FB;
+  --color-girl: #F1948A;
+  --color-girl-soft: #FDEDEC;
 }
 
 @layer base {
   body {
-    @apply bg-bg text-ink selection:bg-accent/20 antialiased;
+    @apply bg-bg text-ink selection:bg-accent/20;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3FfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3F/filter%3E%3Frect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3F/svg%3E");
+    background-attachment: fixed;
+    background-size: 200px 200px;
+    opacity: 0.98;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white border-2 border-line shadow-[4px_4px_0px_0px_rgba(15,23,42,0.05)] rounded-[24px];
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-accent/5;
   }
   
   .bento-grid {
@@ -33,22 +37,18 @@
   }
   
   .bento-item {
-    @apply bg-white p-6 rounded-2xl border-2 border-line shadow-[4px_4px_0px_0px_rgba(15,23,42,0.05)] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)];
+    @apply bg-white/50 backdrop-blur-sm p-5 rounded-[28px] border border-white/60 shadow-sm transition-all hover:shadow-md hover:bg-white/80;
   }
 
   .input-field {
-    @apply w-full bg-white border-2 border-line focus:border-accent focus:ring-0 rounded-xl py-3.5 px-5 transition-all text-sm font-bold placeholder:text-slate-400;
+    @apply w-full bg-white/50 border-2 border-transparent focus:border-accent/20 focus:bg-white rounded-[24px] py-4 px-6 focus:ring-0 transition-all text-sm font-bold placeholder:text-[#C4BCB5] placeholder:font-normal;
   }
 
   .btn-primary {
-    @apply bg-accent text-white px-6 py-4 rounded-xl font-black shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-accent/90;
+    @apply bg-accent text-white px-6 py-3.5 rounded-[24px] font-bold shadow-lg shadow-accent/20 active:scale-95 transition-all hover:brightness-105;
   }
 
   .btn-secondary {
-    @apply bg-white text-ink px-6 py-4 rounded-xl font-black border-2 border-line shadow-[4px_4px_0px_0px_rgba(15,23,42,0.05)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-slate-50;
-  }
-
-  .section-label {
-    @apply text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block;
+    @apply bg-white/80 backdrop-blur-sm text-ink px-6 py-3.5 rounded-[24px] font-bold border border-line shadow-sm active:scale-95 transition-all hover:bg-white;
   }
 }

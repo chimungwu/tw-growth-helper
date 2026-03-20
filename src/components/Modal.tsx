@@ -20,37 +20,39 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, content })
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           />
           
           {/* Modal Content */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="relative w-full max-w-lg bg-white rounded-[32px] shadow-[16px_16px_0px_0px_rgba(15,23,42,0.15)] overflow-hidden border-2 border-line"
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-10">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-2xl font-black text-ink tracking-tight">{title}</h3>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-900">{title}</h3>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 border-2 border-transparent hover:border-line"
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
               
-              <div className="text-ink-muted leading-relaxed whitespace-pre-wrap text-base font-bold mb-10">
+              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                 {content}
               </div>
               
-              <button
-                onClick={onClose}
-                className="btn-primary w-full"
-              >
-                我知道了
-              </button>
+              <div className="mt-8">
+                <button
+                  onClick={onClose}
+                  className="w-full bg-accent text-white py-3 rounded-2xl font-bold shadow-lg hover:brightness-105 active:scale-[0.98] transition-all"
+                >
+                  我知道了
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

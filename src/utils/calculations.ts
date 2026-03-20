@@ -88,8 +88,7 @@ export function calculatePercentileFromValue(val: number, dataAtAge: Record<stri
   const p25 = dataAtAge["25th"];
   const p50 = dataAtAge["50th"];
   const p75 = dataAtAge["75th"];
-// 讓它同時能抓到 85th 或誤標的 84th
-  const p85 = dataAtAge["85th"] || dataAtAge["84th"];
+  const p85 = dataAtAge["85th"];
   const p97 = dataAtAge["97th"];
 
   if (val <= p3) return interpolateValue(val, 0, p3, 0, 3);
