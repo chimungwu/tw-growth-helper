@@ -594,6 +594,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                           <input 
                             type="number"
                             step="0.1"
+                            placeholder="170"
                             value={fatherHeight}
                             onChange={(e) => setFatherHeight(e.target.value)}
                             className="input-field text-center"
@@ -604,6 +605,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                           <input 
                             type="number"
                             step="0.1"
+                            placeholder="160"
                             value={motherHeight}
                             onChange={(e) => setMotherHeight(e.target.value)}
                             className="input-field text-center"
