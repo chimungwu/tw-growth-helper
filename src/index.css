@@ -4,17 +4,17 @@
   --font-sans: "Inter", "Noto Sans TC", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", sans-serif;
   
-  --color-bg: #FDF8F3;
-  --color-ink: #4A443F;
-  --color-ink-muted: #8B8279;
-  --color-accent: #D4A373;
-  --color-accent-soft: #E9D5C3;
-  --color-line: #E8E2DC;
+  --color-bg: #F7F0E8;
+  --color-ink: #352F2A;
+  --color-ink-muted: #6A6158;
+  --color-accent: #B8743E;
+  --color-accent-soft: #D9B89A;
+  --color-line: #CEC2B5;
   
-  --color-boy: #7FB3D5;
-  --color-boy-soft: #EBF5FB;
-  --color-girl: #F1948A;
-  --color-girl-soft: #FDEDEC;
+  --color-boy: #3E84B8;
+  --color-boy-soft: #DCEEF9;
+  --color-girl: #C85F6D;
+  --color-girl-soft: #F9DEE3;
 }
 
 @layer base {
