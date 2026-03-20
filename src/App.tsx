@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, User, UserPlus } from 'lucide-react';
+import { RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, User, UserPlus, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   boyWeightData, boyHeightData, girlWeightData, girlHeightData 
@@ -254,6 +254,12 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
   };
 
   const qaData = [
+    { 
+      q: "認識設計者：阿銘醫師｜仨寶爸中醫博士", 
+      a: "「爸，為什麼你會當醫師？」這是我女兒有一天問我的問題 … 我想了想，回答她：「因為我想讓小朋友不要老是跑醫院，把身體顧好一點，長大比較輕鬆。」這句話，其實也是我一路從醫學院、中醫博士班到現在走進臨床的心情縮影。我是阿銘醫師，一位中醫兒科與體質調理專家，也是一位養著三個小孩的爸爸。我相信中醫的智慧可以成為家長的靠山，讓我們不用慌張，而是穩穩地，一步步陪孩子走過最重要的黃金發育期。",
+      link: "https://drwu.carrd.co/",
+      linkText: "更多資訊：阿銘醫師的個人網站"
+    },
     { q: "這個工具的資料來源是什麼？", a: "引用自陳偉德醫師與張美惠醫師於 2010 年發表的台灣本土研究，該研究根據 WHO 標準制定新的兒童與青少年成長曲線。" },
     { q: "BMI 百分位的標準是依據哪個單位？", a: "採用衛福部國健署於 102 年公告的台灣兒童與青少年體位判定參考值。定義如下：< 5% 為體重過輕；85% - 95% 為過重；> 95% 為肥胖。" },
     { q: "為什麼會出現「生長軌跡與遺傳目標偏差提醒」？", a: "當孩子的身高百分位與根據父母身高計算出的「遺傳百分位」落差超過 15% 時，系統會判定為生長偏離。這能幫助家長及早發現孩子是否長得比預期太快（性早熟風險）或太慢。" },
@@ -570,6 +576,19 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                       className="px-5 pb-4 text-xs text-[#8B837C] leading-relaxed"
                     >
                       {item.a}
+                      {item.link && (
+                        <div className="mt-2">
+                          <a 
+                            href={item.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-[#D4A373] font-bold underline flex items-center gap-1"
+                          >
+                            {item.linkText}
+                            <ExternalLink size={12} />
+                          </a>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -586,7 +605,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
             </p>
           </div>
           <p className="text-[10px] text-[#C4BCB5] uppercase tracking-widest">
-            Version 2026.03.20 ver.20
+            Version 2026.03.20 ver.30
           </p>
         </footer>
       </main>
