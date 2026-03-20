@@ -48,7 +48,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, content })
               <div className="mt-8">
                 <button
                   onClick={onClose}
-                  className="w-full bg-[#991B1B] text-white py-3 rounded-2xl font-bold shadow-lg hover:bg-[#7F1D1D] active:scale-[0.98] transition-all"
+                  className="w-full bg-accent text-white py-3 rounded-2xl font-bold shadow-lg hover:brightness-105 active:scale-[0.98] transition-all"
                 >
                   我知道了
                 </button>

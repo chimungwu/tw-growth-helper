@@ -4,7 +4,11 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, User, UserPlus, ExternalLink } from 'lucide-react';
+import { 
+  RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, 
+  User, UserPlus, ExternalLink, Calendar, Ruler, Weight, Activity,
+  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   boyWeightData, boyHeightData, girlWeightData, girlHeightData 
@@ -35,6 +39,9 @@ export default function App() {
   const [fatherHeight, setFatherHeight] = useState<string>('');
   const [motherHeight, setMotherHeight] = useState<string>('');
   const [showMedian, setShowMedian] = useState(false);
+  const [showParents, setShowParents] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const resultsRef = React.useRef<HTMLDivElement>(null);
   const [openQA, setOpenQA] = useState<number | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
@@ -43,6 +50,14 @@ export default function App() {
     title: '',
     content: ''
   });
+
+  useEffect(() => {
+    if (birthdateInput || height || weight) {
+      setIsCalculating(true);
+      const timer = setTimeout(() => setIsCalculating(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [birthdateInput, height, weight, gender]);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -90,6 +105,32 @@ export default function App() {
       title,
       content: ADVICE_TEXTS[type]
     });
+  };
+
+  const GrowthProgressBar = ({ percentile, label, color }: { percentile: number, label: string, color: string }) => {
+    const isExtreme = percentile < 3 || percentile > 97;
+    return (
+      <div className="space-y-1.5">
+        <div className="flex justify-between items-end">
+          <span className="text-[10px] font-bold text-ink/40 uppercase tracking-widest">{label}</span>
+          <span className={`text-[10px] font-black ${isExtreme ? 'text-red-500' : 'text-accent'}`}>
+            {percentile < 3 ? '< 3rd' : percentile > 97 ? '> 97th' : `${percentile.toFixed(1)}%`}
+          </span>
+        </div>
+        <div className="h-1.5 w-full bg-line/30 rounded-full overflow-hidden relative">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${percentile}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className={`h-full rounded-full ${color}`}
+          />
+          {/* Reference markers */}
+          <div className="absolute top-0 left-[3%] h-full w-px bg-white/50" />
+          <div className="absolute top-0 left-[50%] h-full w-px bg-white/50" />
+          <div className="absolute top-0 left-[97%] h-full w-px bg-white/50" />
+        </div>
+      </div>
+    );
   };
 
   // Derived state: Age
@@ -213,6 +254,20 @@ export default function App() {
     return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant, bmiAdvice, geneticAdvice };
   }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
 
+  useEffect(() => {
+    if (results && !isCalculating) {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [results, isCalculating]);
+
+  useEffect(() => {
+    if (birthdateInput || height || weight) {
+      setIsCalculating(true);
+      const timer = setTimeout(() => setIsCalculating(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [birthdateInput, height, weight, gender]);
+
   const inherited = useMemo(() => {
     if (!fatherHeight || !motherHeight) return null;
     return calculateInheritedHeight(gender, parseFloat(fatherHeight), parseFloat(motherHeight));
@@ -280,318 +335,541 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDF8F3] text-[#4A443F] font-sans pb-12">
+    <div className="min-h-screen bg-[#FDF8F3] text-[#4A443F] font-sans pb-24">
       <Modal 
         isOpen={modal.isOpen} 
         onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
         title={modal.title}
         content={modal.content}
       />
-      {/* Header */}
-      <header className="bg-white border-b border-[#E8E2DC] py-6 px-4 text-center sticky top-0 z-10 shadow-sm">
-        <h1 className="text-2xl font-bold text-[#2D2926] tracking-tight flex items-center justify-center gap-2">
-          <UserPlus className="text-[#D4A373]" />
-          台灣兒童生長曲線小幫手
-        </h1>
-        <p className="text-sm text-[#8B837C] mt-1">專業、精確的成長追蹤工具</p>
-      </header>
-
-      <main className="max-w-md mx-auto px-4 mt-8 space-y-8">
+      
+      <main className="max-w-6xl mx-auto px-5 mt-6 space-y-8">
         {/* PWA Install Banner */}
         {showInstallBanner && (
           <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-[#D4A373] rounded-2xl p-4 shadow-sm flex items-center justify-between gap-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-accent rounded-3xl p-5 shadow-xl shadow-accent/20 flex items-center justify-between gap-4 text-white max-w-md mx-auto lg:max-w-none"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#FDF8F3] rounded-xl flex items-center justify-center">
-                <UserPlus className="text-[#D4A373]" size={20} />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                <Download size={24} />
               </div>
               <div>
-                <p className="text-sm font-bold text-[#2D2926]">安裝生長小幫手</p>
-                <p className="text-[10px] text-[#8B837C]">隨時追蹤，離線也能使用</p>
+                <p className="text-sm font-bold">安裝至主畫面</p>
+                <p className="text-[10px] opacity-80">隨時追蹤，離線也能使用</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button 
-                onClick={() => setShowInstallBanner(false)}
-                className="px-3 py-2 text-xs text-[#8B837C] font-medium"
-              >
-                稍後
-              </button>
-              <button 
-                onClick={handleInstallClick}
-                className="bg-[#D4A373] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm"
-              >
-                安裝
-              </button>
-            </div>
+            <button 
+              onClick={handleInstallClick}
+              className="bg-white text-[#D4A373] px-5 py-2.5 rounded-2xl text-xs font-bold shadow-lg active:scale-95 transition-transform"
+            >
+              立即安裝
+            </button>
           </motion.div>
         )}
 
-        {/* Results Card */}
-        <AnimatePresence mode="wait">
-          {results ? (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#E9F1FF] border-2 border-[#B8CDEE] rounded-3xl p-6 shadow-xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -mr-12 -mt-12 blur-2xl" />
-              
-              <div className="space-y-4 relative z-10">
-                <div className="text-center border-b border-[#B8CDEE] pb-4">
-                  <p className="text-[#1E3A8A] font-bold text-lg">
-                    {gender === 'boy' ? '👦 男孩' : '👧 女孩'} {ageData?.display}
-                  </p>
-                </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/50 p-3 rounded-2xl">
-                      <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">身高百分位</p>
-                      {(() => {
-                        const { text, isExtreme } = formatPercentile(results.hRes.percentile);
-                        return (
-                          <p className={`text-2xl font-black ${isExtreme ? 'text-[#EF4444]' : 'text-[#1E3A8A]'}`}>
-                            {text}
-                          </p>
-                        );
-                      })()}
-                      <p className="text-[10px] text-[#5B7CB2] mt-1">{height} cm</p>
-                    </div>
-                    <div className="bg-white/50 p-3 rounded-2xl">
-                      <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">體重百分位</p>
-                      {(() => {
-                        const { text, isExtreme } = formatPercentile(results.wRes.percentile);
-                        return (
-                          <p className={`text-2xl font-black ${isExtreme ? 'text-[#EF4444]' : 'text-[#1E3A8A]'}`}>
-                            {text}
-                          </p>
-                        );
-                      })()}
-                      <p className="text-[10px] text-[#5B7CB2] mt-1">{weight} kg</p>
-                    </div>
-                  </div>
-
-                <div className="bg-white/80 p-4 rounded-2xl text-center">
-                  <p className="text-sm font-bold text-[#1E3A8A]">
-                    BMI: {results.bmi} <span className="px-2 py-0.5 bg-[#B8CDEE] rounded-full text-xs ml-2">{results.bmiCategory}</span>
-                  </p>
-                </div>
-
-                {results.geneticComparison && (
-                  <div className="bg-white/50 p-3 rounded-2xl text-center">
-                    <p className="text-xs font-bold text-[#1E3A8A]">{results.geneticComparison}</p>
-                    {results.geneticPercentile !== null && (
-                      <p className="text-[10px] text-[#5B7CB2] mt-0.5">
-                        遺傳百分位: {formatPercentile(results.geneticPercentile).text}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {(results.quadrant || results.bmiAdvice || results.geneticAdvice) && (
-                  <div className="space-y-2">
-                    {results.quadrant && (
-                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">🔴</span>
-                          <span className="text-sm font-bold text-[#991B1B]">發育狀態提醒</span>
-                        </div>
-                        <button 
-                          onClick={() => openAdvice(results.quadrant as keyof typeof ADVICE_TEXTS, "發育狀態建議")}
-                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
-                        >
-                          查看建議
-                        </button>
-                      </div>
-                    )}
-                    {results.bmiAdvice && (
-                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">⚖️</span>
-                          <span className="text-sm font-bold text-[#991B1B]">體位狀態提醒</span>
-                        </div>
-                        <button 
-                          onClick={() => openAdvice(results.bmiAdvice as keyof typeof ADVICE_TEXTS, "體位狀態建議")}
-                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
-                        >
-                          查看建議
-                        </button>
-                      </div>
-                    )}
-                    {results.geneticAdvice && (
-                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">🧬</span>
-                          <span className="text-sm font-bold text-[#991B1B]">生長軌跡與遺傳目標偏差提醒</span>
-                        </div>
-                        <button 
-                          onClick={() => openAdvice(results.geneticAdvice as keyof typeof ADVICE_TEXTS, "生長軌跡與遺傳目標偏差建議")}
-                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
-                        >
-                          查看建議
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {inherited && (
-                  <div className="bg-[#D1E2FF] p-4 rounded-2xl border border-[#B8CDEE]">
-                    <p className="text-xs text-[#5B7CB2] font-bold text-center mb-1">預估目標身高</p>
-                    <p className="text-xl font-black text-[#1E3A8A] text-center">{inherited.median.toFixed(1)} cm</p>
-                    <p className="text-[10px] text-[#5B7CB2] text-center">範圍: {inherited.min.toFixed(1)} - {inherited.max.toFixed(1)} cm</p>
-                  </div>
-                )}
-
-                {showMedian && (
-                  <motion.div 
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    className="bg-white/30 p-3 rounded-xl border border-dashed border-[#B8CDEE] text-xs space-y-1"
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Input Form & Desktop Q&A */}
+          <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-24">
+            {/* Input Form Section */}
+            <div className="glass-card rounded-[40px] p-8 space-y-8">
+              {/* Gender Selection */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] ml-2">選擇性別</label>
+                <div className="flex p-2 bg-bg rounded-[28px] gap-2">
+                  <button 
+                    onClick={() => setGender('boy')}
+                    className={`flex-1 py-4 rounded-[22px] text-sm font-black transition-all flex items-center justify-center gap-2 ${gender === 'boy' ? 'bg-white text-boy shadow-lg shadow-boy/5' : 'text-ink/40 hover:bg-white/50'}`}
                   >
-                    <p className="font-bold text-[#5B7CB2]">同年齡 50% 標準值：</p>
-                    <div className="flex justify-between">
-                      <span>身高: {results.hRes.p50.toFixed(1)} cm</span>
-                      <span>體重: {results.wRes.p50.toFixed(1)} kg</span>
+                    <span className="text-xl">👦</span> 男孩
+                  </button>
+                  <button 
+                    onClick={() => setGender('girl')}
+                    className={`flex-1 py-4 rounded-[22px] text-sm font-black transition-all flex items-center justify-center gap-2 ${gender === 'girl' ? 'bg-white text-girl shadow-lg shadow-girl/5' : 'text-ink/40 hover:bg-white/50'}`}
+                  >
+                    <span className="text-xl">👧</span> 女孩
+                  </button>
+                </div>
+              </div>
+
+              {/* Basic Info */}
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between ml-2">
+                    <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em]">生日或年齡</label>
+                    <span className="text-[10px] text-accent font-black uppercase tracking-widest">YYYYMMDD</span>
+                  </div>
+                  <div className="relative group">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent group-focus-within:scale-110 transition-transform">
+                      <Calendar size={20} />
+                    </div>
+                    <input 
+                      type="text"
+                      placeholder="例如：20150620 或 8.5"
+                      value={birthdateInput}
+                      onChange={(e) => setBirthdateInput(e.target.value)}
+                      className="input-field pl-16 pr-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] ml-2">目前身高 (cm)</label>
+                    <div className="relative group">
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent">
+                        <Ruler size={20} />
+                      </div>
+                      <input 
+                        type="number"
+                        step="0.1"
+                        placeholder="120.5"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                        className="input-field pl-16 pr-6"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] ml-2">目前體重 (kg)</label>
+                    <div className="relative group">
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent">
+                        <Weight size={20} />
+                      </div>
+                      <input 
+                        type="number"
+                        step="0.1"
+                        placeholder="25.0"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        className="input-field pl-16 pr-6"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Parents Height (Optional) */}
+              <div className="pt-4 border-t border-line/30">
+                <button 
+                  onClick={() => setShowParents(!showParents)}
+                  className="w-full flex items-center justify-between py-2 group"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full transition-colors ${showParents ? 'bg-accent' : 'bg-ink/20'}`} />
+                    <span className="text-[10px] font-black text-ink/30 uppercase tracking-[0.3em] group-hover:text-accent transition-colors">父母身高 (選填)</span>
+                  </div>
+                  <div className={`w-8 h-8 rounded-2xl bg-bg flex items-center justify-center text-accent transition-all ${showParents ? 'rotate-180 bg-accent text-white' : ''}`}>
+                    <ChevronDown size={16} />
+                  </div>
+                </button>
+                
+                <AnimatePresence>
+                  {showParents && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid grid-cols-2 gap-5 pt-6">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black text-ink/40 uppercase tracking-widest ml-2 text-center block">爸爸身高 (cm)</label>
+                          <input 
+                            type="number"
+                            step="0.1"
+                            value={fatherHeight}
+                            onChange={(e) => setFatherHeight(e.target.value)}
+                            className="input-field text-center"
+                          />
+                        </div>
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black text-ink/40 uppercase tracking-widest ml-2 text-center block">媽媽身高 (cm)</label>
+                          <input 
+                            type="number"
+                            step="0.1"
+                            value={motherHeight}
+                            onChange={(e) => setMotherHeight(e.target.value)}
+                            className="input-field text-center"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Desktop Q&A Preview */}
+            <div className="hidden lg:block glass-card rounded-[40px] p-8 space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-accent/10 rounded-2xl flex items-center justify-center text-accent">
+                  <HelpCircle size={20} />
+                </div>
+                <h3 className="text-lg font-black text-ink font-display">常見問題</h3>
+              </div>
+              <p className="text-xs text-ink/50 font-medium leading-relaxed">
+                有關於生長曲線、遺傳身高或 BMI 的疑問嗎？查看下方的 Q&A 區塊了解更多專業建議。
+              </p>
+              <button 
+                onClick={() => {
+                  const qaSection = document.getElementById('qa-section');
+                  qaSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-xs font-black text-accent hover:underline flex items-center gap-2"
+              >
+                前往 Q&A 區塊 <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: Results Section */}
+          <div className="lg:col-span-7 space-y-6">
+            <div ref={resultsRef} className="scroll-mt-24">
+              <AnimatePresence mode="wait">
+                {isCalculating ? (
+                  <motion.div 
+                    key="calculating"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="glass-card rounded-[40px] p-12 flex flex-col items-center justify-center space-y-4"
+                  >
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="w-12 h-12 border-4 border-accent/20 border-t-accent rounded-full"
+                    />
+                    <p className="text-xs font-black text-accent uppercase tracking-widest animate-pulse">正在精確分析中...</p>
+                  </motion.div>
+                ) : results ? (
+                  <motion.div 
+                    key="results"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="space-y-4"
+                  >
+                  {/* Main Result Card */}
+                  <div className="glass-card rounded-[40px] p-8 relative overflow-hidden">
+                    <div className={`absolute top-0 right-0 w-48 h-48 rounded-full -mr-24 -mt-24 blur-3xl opacity-20 ${gender === 'boy' ? 'bg-boy' : 'bg-girl'}`} />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent/10 rounded-full -ml-16 -mb-16 blur-3xl" />
+                    
+                    <div className="relative z-10 space-y-8">
+                      <div className="flex items-center justify-between border-b border-line/50 pb-6">
+                        <div className="flex items-center gap-4">
+                          <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className={`w-14 h-14 rounded-3xl flex items-center justify-center text-3xl shadow-inner ${gender === 'boy' ? 'bg-boy-soft' : 'bg-girl-soft'}`}
+                          >
+                            {gender === 'boy' ? '👦' : '👧'}
+                          </motion.div>
+                          <div>
+                            <p className={`text-lg font-black tracking-tight ${gender === 'boy' ? 'text-boy' : 'text-girl'}`}>
+                              {gender === 'boy' ? '男孩' : '女孩'}
+                            </p>
+                            <p className="text-xs font-bold text-ink/50">{ageData?.display}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] font-black text-ink/30 uppercase tracking-[0.2em]">BMI 指數</p>
+                          <p className="text-2xl font-black text-ink font-display">{results.bmi}</p>
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black mt-1 ${
+                            results.bmiCategory === '正常' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
+                          }`}>
+                            {results.bmiCategory === '正常' && <CheckCircle2 size={10} />}
+                            {results.bmiCategory}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Percentile Bento Grid */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bento-item space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${gender === 'boy' ? 'bg-boy-soft text-boy' : 'bg-girl-soft text-girl'}`}>
+                              <Ruler size={16} />
+                            </div>
+                            <span className="text-[10px] font-black text-ink/30 uppercase tracking-widest">身高</span>
+                          </div>
+                          <div className="space-y-1">
+                            {(() => {
+                              const { text, isExtreme } = formatPercentile(results.hRes.percentile);
+                              return (
+                                <div className="flex items-baseline gap-1">
+                                  <p className={`text-3xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
+                                    {text.replace('%', '')}
+                                  </p>
+                                  {!isExtreme && <span className="text-xs font-bold text-ink/40">%</span>}
+                                </div>
+                              );
+                            })()}
+                            <p className="text-xs font-bold text-ink/40">{height} cm</p>
+                          </div>
+                          <GrowthProgressBar 
+                            percentile={results.hRes.percentile} 
+                            label="生長進度" 
+                            color={gender === 'boy' ? 'bg-boy' : 'bg-girl'} 
+                          />
+                        </div>
+
+                        <div className="bento-item space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="w-8 h-8 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500">
+                              <Weight size={16} />
+                            </div>
+                            <span className="text-[10px] font-black text-ink/30 uppercase tracking-widest">體重</span>
+                          </div>
+                          <div className="space-y-1">
+                            {(() => {
+                              const { text, isExtreme } = formatPercentile(results.wRes.percentile);
+                              return (
+                                <div className="flex items-baseline gap-1">
+                                  <p className={`text-3xl font-black tracking-tighter font-display ${isExtreme ? 'text-red-500' : 'text-ink'}`}>
+                                    {text.replace('%', '')}
+                                  </p>
+                                  {!isExtreme && <span className="text-xs font-bold text-ink/40">%</span>}
+                                </div>
+                              );
+                            })()}
+                            <p className="text-xs font-bold text-ink/40">{weight} kg</p>
+                          </div>
+                          <GrowthProgressBar 
+                            percentile={results.wRes.percentile} 
+                            label="重量進度" 
+                            color="bg-orange-500" 
+                          />
+                        </div>
+                      </div>
+
+                      {/* Genetic Comparison */}
+                      {results.geneticComparison && (
+                        <motion.div 
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="bg-accent/5 p-5 rounded-[28px] border border-dashed border-accent/30"
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-accent shadow-sm">
+                              <Info size={20} />
+                            </div>
+                            <div className="space-y-1.5 flex-1">
+                              <p className="text-xs font-bold text-ink leading-relaxed">
+                                {results.geneticComparison}
+                              </p>
+                              {results.geneticPercentile !== null && (
+                                <div className="pt-2">
+                                  <GrowthProgressBar 
+                                    percentile={results.geneticPercentile} 
+                                    label="遺傳目標百分位" 
+                                    color="bg-accent" 
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-4 pt-2">
+                        <button 
+                          onClick={copyResults} 
+                          className="btn-secondary flex-1 text-xs flex items-center justify-center gap-2"
+                        >
+                          <Share2 size={16} className="text-accent" /> 複製分享
+                        </button>
+                        <button 
+                          onClick={exportCSV} 
+                          className="btn-secondary flex-1 text-xs flex items-center justify-center gap-2"
+                        >
+                          <Download size={16} className="text-accent" /> 匯出紀錄
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Advice Badges */}
+                  {(results.quadrant || results.bmiAdvice || results.geneticAdvice) && (
+                    <div className="grid grid-cols-1 gap-3">
+                      {results.quadrant && (
+                        <motion.button 
+                          whileHover={{ scale: 1.02, x: 5 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => openAdvice(results.quadrant as keyof typeof ADVICE_TEXTS, "發育狀態建議")}
+                          className="bg-red-50/80 backdrop-blur-sm border border-red-100 p-5 rounded-[28px] flex items-center justify-between text-left group shadow-sm"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 shadow-inner">
+                              <Activity size={24} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-red-900">發育狀態提醒</p>
+                              <p className="text-[10px] text-red-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                            </div>
+                          </div>
+                          <ArrowRight size={18} className="text-red-400 group-hover:translate-x-1 transition-transform" />
+                        </motion.button>
+                      )}
+                      {results.bmiAdvice && (
+                        <motion.button 
+                          whileHover={{ scale: 1.02, x: 5 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => openAdvice(results.bmiAdvice as keyof typeof ADVICE_TEXTS, "體位狀態建議")}
+                          className="bg-orange-50/80 backdrop-blur-sm border border-orange-100 p-5 rounded-[28px] flex items-center justify-between text-left group shadow-sm"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shadow-inner">
+                              <Activity size={24} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-orange-900">體位狀態提醒</p>
+                              <p className="text-[10px] text-orange-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                            </div>
+                          </div>
+                          <ArrowRight size={18} className="text-orange-400 group-hover:translate-x-1 transition-transform" />
+                        </motion.button>
+                      )}
+                      {results.geneticAdvice && (
+                        <motion.button 
+                          whileHover={{ scale: 1.02, x: 5 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => openAdvice(results.geneticAdvice as keyof typeof ADVICE_TEXTS, "遺傳偏差建議")}
+                          className="bg-amber-50/80 backdrop-blur-sm border border-amber-100 p-5 rounded-[28px] flex items-center justify-between text-left group shadow-sm"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shadow-inner">
+                              <Activity size={24} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-amber-900 leading-tight">生長軌跡與遺傳目標偏差提醒</p>
+                              <p className="text-[10px] text-amber-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                            </div>
+                          </div>
+                          <ArrowRight size={18} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
+                        </motion.button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Adult Prediction Card */}
+                  {inherited && (
+                    <motion.div 
+                      whileHover={{ scale: 1.01 }}
+                      className="bg-accent rounded-[40px] p-8 text-white shadow-2xl shadow-accent/30 relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+                      <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                      
+                      <div className="relative z-10 flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">預估成年身高</p>
+                          <p className="text-4xl font-black tracking-tighter font-display">{inherited.median.toFixed(1)} <span className="text-lg font-bold">cm</span></p>
+                          <div className="flex items-center gap-2 mt-2 opacity-80">
+                            <div className="h-1 w-12 bg-white/30 rounded-full overflow-hidden">
+                              <div className="h-full bg-white w-2/3" />
+                            </div>
+                            <p className="text-[10px] font-bold">遺傳範圍：{inherited.min.toFixed(1)} - {inherited.max.toFixed(1)}</p>
+                          </div>
+                        </div>
+                        <div className="w-20 h-20 bg-white/20 rounded-[32px] flex items-center justify-center backdrop-blur-md shadow-lg">
+                          <Ruler size={40} strokeWidth={2.5} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Median Values Toggle */}
+                  <div className="glass-card rounded-[32px] overflow-hidden">
+                    <button 
+                      onClick={() => setShowMedian(!showMedian)}
+                      className="w-full px-8 py-5 flex items-center justify-between hover:bg-bg/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-bg rounded-2xl flex items-center justify-center text-accent">
+                          <Info size={20} />
+                        </div>
+                        <span className="text-sm font-black text-ink">查看同年齡 50% 標準值</span>
+                      </div>
+                      <div className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-all ${showMedian ? 'bg-accent text-white rotate-180' : 'bg-bg text-ink/30'}`}>
+                        <ChevronDown size={16} />
+                      </div>
+                    </button>
+                    <AnimatePresence>
+                      {showMedian && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="px-8 pb-6"
+                        >
+                          <div className="grid grid-cols-2 gap-5 pt-2">
+                            <div className="bg-bg p-5 rounded-[24px] border border-line/30">
+                              <p className="text-[10px] font-black text-ink/30 uppercase tracking-[0.2em] mb-2">身高標準</p>
+                              <p className="text-xl font-black text-ink font-display">{results.hRes.p50.toFixed(1)} <span className="text-xs font-bold text-ink/40">cm</span></p>
+                            </div>
+                            <div className="bg-bg p-5 rounded-[24px] border border-line/30">
+                              <p className="text-[10px] font-black text-ink/30 uppercase tracking-[0.2em] mb-2">體重標準</p>
+                              <p className="text-xl font-black text-ink font-display">{results.wRes.p50.toFixed(1)} <span className="text-xs font-bold text-ink/40">kg</span></p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+                ) : (
+                  <motion.div 
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="glass-card rounded-[40px] p-12 text-center border-2 border-dashed border-line space-y-6"
+                  >
+                    <motion.div 
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      className="w-24 h-24 bg-bg rounded-[40px] flex items-center justify-center mx-auto shadow-inner"
+                    >
+                      <UserPlus className="text-accent" size={48} />
+                    </motion.div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-black text-ink font-display">開始分析</h3>
+                      <p className="text-sm text-ink/40 font-medium max-w-[240px] mx-auto leading-relaxed">請在<span className="lg:hidden">上方</span><span className="hidden lg:inline">左側</span>輸入孩子的資料，我們將為您進行精確分析</p>
                     </div>
                   </motion.div>
                 )}
-
-                <div className="flex gap-2 pt-2">
-                  <button onClick={copyResults} className="flex-1 bg-white hover:bg-gray-50 text-[#1E3A8A] py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-sm">
-                    <Copy size={14} /> 複製
-                  </button>
-                  <button onClick={exportCSV} className="flex-1 bg-white hover:bg-gray-50 text-[#1E3A8A] py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-sm">
-                    <Download size={14} /> 匯出
-                  </button>
-                  <button 
-                    onClick={() => setShowMedian(!showMedian)}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm ${showMedian ? 'bg-[#1E3A8A] text-white' : 'bg-white text-[#1E3A8A]'}`}
-                  >
-                    50%
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <div className="bg-white border-2 border-dashed border-[#E8E2DC] rounded-3xl p-12 text-center space-y-4">
-              <div className="w-16 h-16 bg-[#FDF8F3] rounded-full flex items-center justify-center mx-auto">
-                <User className="text-[#D4A373]" size={32} />
-              </div>
-              <p className="text-sm text-[#8B837C]">請在下方輸入資料以查看分析結果</p>
-            </div>
-          )}
-        </AnimatePresence>
-
-        {/* Input Form */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#E8E2DC] space-y-6">
-          {/* Gender */}
-          <div className="flex items-center justify-center gap-4">
-            <button 
-              onClick={() => setGender('boy')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 transition-all ${gender === 'boy' ? 'bg-[#E9F1FF] border-[#B8CDEE] text-[#1E3A8A] font-bold' : 'bg-white border-[#F5F2EF] text-[#8B837C]'}`}
-            >
-              男孩
-            </button>
-            <button 
-              onClick={() => setGender('girl')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 transition-all ${gender === 'girl' ? 'bg-[#FFF0F5] border-[#FFD1DC] text-[#C71585] font-bold' : 'bg-white border-[#F5F2EF] text-[#8B837C]'}`}
-            >
-              女孩
-            </button>
-            <button 
-              onClick={() => {
-                setBirthdateInput(''); setHeight(''); setWeight('');
-                setFatherHeight(''); setMotherHeight('');
-              }}
-              className="p-3 bg-[#FDF8F3] rounded-2xl text-[#8B837C] hover:bg-[#F5F2EF] transition-colors"
-            >
-              <RefreshCw size={20} />
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#8B837C] uppercase tracking-wider ml-1">生日 / 年齡</label>
-              <input 
-                type="text"
-                placeholder="YYYYMMDD 或 直接輸入年齡"
-                value={birthdateInput}
-                onChange={(e) => setBirthdateInput(e.target.value)}
-                className="w-full bg-[#FDF8F3] border-none rounded-2xl py-4 px-5 focus:ring-2 focus:ring-[#D4A373] transition-all text-center placeholder:text-[#C4BCB5]"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#8B837C] uppercase tracking-wider ml-1">身高 (cm)</label>
-                <input 
-                  type="number"
-                  step="0.1"
-                  value={height}
-                  onChange={(e) => setHeight(e.target.value)}
-                  className="w-full bg-[#FDF8F3] border-none rounded-2xl py-4 px-5 focus:ring-2 focus:ring-[#D4A373] transition-all text-center"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#8B837C] uppercase tracking-wider ml-1">體重 (kg)</label>
-                <input 
-                  type="number"
-                  step="0.1"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  className="w-full bg-[#FDF8F3] border-none rounded-2xl py-4 px-5 focus:ring-2 focus:ring-[#D4A373] transition-all text-center"
-                />
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-[#F5F2EF]">
-              <p className="text-[10px] font-bold text-[#C4BCB5] text-center mb-3 uppercase tracking-widest">父母身高 (預估成年身高用)</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#8B837C] uppercase tracking-wider ml-1">爸爸 (cm)</label>
-                  <input 
-                    type="number"
-                    step="0.1"
-                    value={fatherHeight}
-                    onChange={(e) => setFatherHeight(e.target.value)}
-                    className="w-full bg-[#FDF8F3] border-none rounded-2xl py-4 px-5 focus:ring-2 focus:ring-[#D4A373] transition-all text-center"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#8B837C] uppercase tracking-wider ml-1">媽媽 (cm)</label>
-                  <input 
-                    type="number"
-                    step="0.1"
-                    value={motherHeight}
-                    onChange={(e) => setMotherHeight(e.target.value)}
-                    className="w-full bg-[#FDF8F3] border-none rounded-2xl py-4 px-5 focus:ring-2 focus:ring-[#D4A373] transition-all text-center"
-                  />
-                </div>
-              </div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
         {/* Q&A Section */}
-        <div className="space-y-3">
-          <h2 className="text-lg font-bold text-[#2D2926] flex items-center gap-2 ml-2">
-            <HelpCircle size={20} className="text-[#D4A373]" />
-            常見問題 Q&A
-          </h2>
-          <div className="space-y-2">
+        <div id="qa-section" className="space-y-6 pb-12">
+          <div className="flex items-center gap-4 ml-3">
+            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-line">
+              <HelpCircle size={22} className="text-accent" />
+            </div>
+            <h2 className="text-xl font-black text-ink font-display">常見問題 Q&A</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {qaData.map((item, index) => (
-              <div key={index} className="bg-white rounded-2xl border border-[#E8E2DC] overflow-hidden">
+              <motion.div 
+                key={index} 
+                initial={false}
+                className="bg-white/60 backdrop-blur-sm rounded-[32px] border border-line overflow-hidden shadow-sm hover:shadow-md transition-all"
+              >
                 <button 
                   onClick={() => setOpenQA(openQA === index ? null : index)}
-                  className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FDF8F3] transition-colors"
+                  className="w-full px-8 py-6 flex items-center justify-between text-left group"
                 >
-                  <span className="text-sm font-bold text-[#4A443F]">{item.q}</span>
-                  {openQA === index ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  <span className="text-sm font-black text-ink leading-snug group-hover:text-accent transition-colors">{item.q}</span>
+                  <div className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-all ${openQA === index ? 'bg-accent text-white rotate-180' : 'bg-bg text-ink/30'}`}>
+                    <ChevronDown size={16} />
+                  </div>
                 </button>
                 <AnimatePresence>
                   {openQA === index && (
@@ -599,42 +877,63 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="px-5 pb-4 text-xs text-[#8B837C] leading-relaxed"
+                      className="px-8 pb-8"
                     >
-                      {item.a}
-                      {item.link && (
-                        <div className="mt-2">
-                          <a 
+                      <div className="pt-2 text-xs text-ink/60 font-medium leading-relaxed space-y-4">
+                        <p>{item.a}</p>
+                        {item.link && (
+                          <motion.a 
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             href={item.link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-[#D4A373] font-bold underline flex items-center gap-1"
+                            className="inline-flex items-center gap-3 bg-accent text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-accent/20 transition-all"
                           >
                             {item.linkText}
-                            <ExternalLink size={12} />
-                          </a>
-                        </div>
-                      )}
+                            <ExternalLink size={14} />
+                          </motion.a>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="text-center space-y-4 pt-8">
-          <div className="inline-block bg-white px-6 py-4 rounded-3xl border border-[#E8E2DC] shadow-sm">
-            <p className="text-xs text-[#8B837C]">
-              程式維護：<a href="https://www.facebook.com/profile.php?id=61557246475372" target="_blank" className="text-[#D4A373] font-bold hover:underline">仨寶爸中醫博士吳啓銘</a>
-            </p>
-          </div>
-          <p className="text-[10px] text-[#C4BCB5] uppercase tracking-widest">
-            Version 2026.03.20 ver.30
-          </p>
-        </footer>
       </main>
+
+      {/* Banner / Footer */}
+      <footer className="bg-white/80 backdrop-blur-2xl border-t border-line py-5 px-6 fixed bottom-0 left-0 right-0 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <motion.div 
+              whileHover={{ rotate: 10 }}
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg transition-colors ${gender === 'boy' ? 'bg-boy shadow-boy/20' : 'bg-girl shadow-girl/20'}`}
+            >
+              <Heart className="text-white" size={22} fill="currentColor" />
+            </motion.div>
+            <div>
+              <h1 className="text-lg font-black text-ink tracking-tight leading-none font-display">
+                台灣兒童生長曲線小幫手
+              </h1>
+              <p className="text-[10px] text-ink/40 font-bold tracking-tight mt-1">專業、精確的成長評估工具</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => {
+              setBirthdateInput(''); setHeight(''); setWeight('');
+              setFatherHeight(''); setMotherHeight('');
+              setModal({ isOpen: true, title: '已重置', content: '所有輸入資料已清除。' });
+            }}
+            className="p-3 bg-white rounded-2xl text-ink/40 hover:text-accent hover:bg-accent/5 transition-all border border-line active:scale-95"
+            title="重置資料"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
