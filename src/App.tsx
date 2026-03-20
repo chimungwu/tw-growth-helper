@@ -22,7 +22,8 @@ const ADVICE_TEXTS = {
   fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。",
   underweight: "【體重過輕建議】\n建議增加營養攝取，特別是優質蛋白質與健康油脂。若伴隨食慾不振，可考慮中醫調理脾胃，並排除寄生蟲或吸收不良等因素。",
   overweight: "【體重過重建議】\n建議調整飲食結構，減少高糖、高油與加工食品。增加戶外運動量，並監測是否有代謝異常或性早熟風險。建議諮詢醫師或營養師進行體重管理。",
-  genetic_fast: "【生長超前建議】\n目前生長進度大幅超越遺傳潛力，這可能是「性早熟」的徵兆。建議監測骨齡，確認生長板是否提早閉合，並減少環境荷爾蒙接觸。若身高突然衝高但伴隨第二性徵出現，請務必諮詢專業醫師。"
+  genetic_fast: "【生長超前建議】\n目前生長進度大幅超越遺傳潛力，這可能是「性早熟」的徵兆。建議監測骨齡，確認生長板是否提早閉合，並減少環境荷爾蒙接觸。若身高突然衝高但伴隨第二性徵出現，請務必諮詢專業醫師。",
+  genetic_slow: "【生長落後建議】\n目前生長進度顯著落後於遺傳潛力。建議加強脾胃調理，確保優質蛋白質攝取，並維持充足睡眠（晚上10點前入睡）。若百分位持續下滑，建議諮詢小兒內分泌科醫師排除生長激素不足或其他生理因素。"
 };
 
 export default function App() {
@@ -173,9 +174,9 @@ export default function App() {
       
       const diff = hRes.percentile - geneticPercentile;
       if (diff < -15) {
-        geneticComparison = '⚠️ 目前生長進度跑輸遺傳潛力。';
+        geneticComparison = '⚠️ 根據 Tanner 遺傳常模預估，目前生長曲線有偏離現象（落後），建議諮詢專業中西醫調養。';
       } else if (diff > 15) {
-        geneticComparison = '🎉 目前生長進度跑贏遺傳潛力。 (⚠️ 需留意性早熟風險)';
+        geneticComparison = '⚠️ 根據 Tanner 遺傳常模預估，目前生長曲線有偏離現象（超前），需留意性早熟風險，建議諮詢專業中西醫調養。';
       } else {
         geneticComparison = '符合遺傳預期。';
       }
@@ -183,7 +184,13 @@ export default function App() {
 
     const quadrant = checkGrowthQuadrant(gender, age, hRes.percentile);
     const bmiAdvice = bmiCategory === "體重過輕" ? "underweight" : (bmiCategory === "體重過重" || bmiCategory === "肥胖" ? "overweight" : null);
-    const geneticAdvice = (hRes.percentile - (geneticPercentile || 0)) > 15 ? "genetic_fast" : null;
+    
+    let geneticAdvice: keyof typeof ADVICE_TEXTS | null = null;
+    if (geneticPercentile !== null) {
+      const diff = hRes.percentile - geneticPercentile;
+      if (diff > 15) geneticAdvice = "genetic_fast";
+      else if (diff < -15) geneticAdvice = "genetic_slow";
+    }
 
     return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant, bmiAdvice, geneticAdvice };
   }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
