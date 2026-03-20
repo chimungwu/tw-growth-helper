@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, 
   User, UserPlus, ExternalLink, Calendar, Ruler, Weight, Activity,
-  Info, Heart, Share2, Trash2, ArrowRight, CheckCircle2, RefreshCcw,
+  Info, Heart, Share2, Trash2, ArrowRight, ArrowLeft, CheckCircle2, RefreshCcw, Target,
   Facebook, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -143,6 +143,45 @@ export default function App() {
           <div className="absolute top-0 left-[3%] h-full w-px bg-white/50" />
           <div className="absolute top-0 left-[50%] h-full w-px bg-white/50" />
           <div className="absolute top-0 left-[97%] h-full w-px bg-white/50" />
+        </div>
+      </div>
+    );
+  };
+
+  const GeneticDeviationIndicator = ({ currentPercentile, targetPercentile }: { currentPercentile: number; targetPercentile: number }) => {
+    const diff = currentPercentile - targetPercentile;
+    const clampedDiff = Math.max(-30, Math.min(30, diff));
+    const markerPosition = ((clampedDiff + 30) / 60) * 100;
+    const isAlert = Math.abs(diff) > 15;
+    const directionLabel = diff > 2 ? '高於目標' : diff < -2 ? '低於目標' : '接近目標';
+    const directionColor = diff > 2 ? 'text-rose-600' : diff < -2 ? 'text-blue-600' : 'text-emerald-600';
+
+    return (
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-ink/40 uppercase tracking-widest">遺傳偏離程度</span>
+          <span className={`text-xs font-black ${directionColor}`}>
+            {diff >= 0 ? '+' : ''}{diff.toFixed(1)}%
+          </span>
+        </div>
+        <div className="relative h-2.5 rounded-full bg-gradient-to-r from-blue-100 via-emerald-100 to-rose-100 overflow-hidden">
+          <div className="absolute inset-y-0 left-1/2 w-px bg-ink/30" />
+          <div
+            className={`absolute -top-1.5 w-5 h-5 rounded-full border-2 shadow-sm flex items-center justify-center ${
+              isAlert ? 'bg-red-500 border-red-200 text-white' : 'bg-accent border-white text-white'
+            }`}
+            style={{ left: `calc(${markerPosition}% - 10px)` }}
+          >
+            <Target size={10} />
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-[11px] font-bold text-ink/50">
+          <span className="inline-flex items-center gap-1"><ArrowLeft size={12} />落後較多</span>
+          <span className="text-ink/70">遺傳目標</span>
+          <span className="inline-flex items-center gap-1">超前較多<ArrowRight size={12} /></span>
+        </div>
+        <div className={`text-xs font-bold ${directionColor}`}>
+          {directionLabel}（目前 {currentPercentile.toFixed(1)}% / 目標 {targetPercentile.toFixed(1)}%）
         </div>
       </div>
     );
@@ -724,10 +763,9 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                               </p>
                               {results.geneticPercentile !== null && (
                                 <div className="pt-2">
-                                  <GrowthProgressBar 
-                                    percentile={results.geneticPercentile} 
-                                    label="遺傳目標百分位" 
-                                    color="bg-accent" 
+                                  <GeneticDeviationIndicator
+                                    currentPercentile={results.hRes.percentile}
+                                    targetPercentile={results.geneticPercentile}
                                   />
                                 </div>
                               )}
