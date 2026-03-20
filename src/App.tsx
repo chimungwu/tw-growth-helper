@@ -270,6 +270,12 @@ export default function App() {
   }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
 
   useEffect(() => {
+    if (results && !isCalculating) {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [results, isCalculating]);
+
+  useEffect(() => {
     if (birthdateInput || height || weight) {
       setIsCalculating(true);
       const timer = setTimeout(() => setIsCalculating(false), 400);
