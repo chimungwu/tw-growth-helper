@@ -770,7 +770,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <div>
                               <p className="text-sm font-black text-red-900">發育狀態提醒</p>
-                              <p className="text-xs text-red-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                              <p className="text-xs text-red-700/60 font-bold uppercase tracking-wider">點擊查看建議</p>
                             </div>
                           </div>
                           <ArrowRight size={18} className="text-red-400 group-hover:translate-x-1 transition-transform" />
@@ -789,7 +789,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <div>
                               <p className="text-sm font-black text-orange-900">體位狀態提醒</p>
-                              <p className="text-xs text-orange-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                              <p className="text-xs text-orange-700/60 font-bold uppercase tracking-wider">點擊查看建議</p>
                             </div>
                           </div>
                           <ArrowRight size={18} className="text-orange-400 group-hover:translate-x-1 transition-transform" />
@@ -808,7 +808,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             </div>
                             <div>
                               <p className="text-sm font-black text-amber-900 leading-tight">生長軌跡與遺傳目標偏差提醒</p>
-                              <p className="text-xs text-amber-700/60 font-bold uppercase tracking-wider">點擊查看阿銘醫師建議</p>
+                              <p className="text-xs text-amber-700/60 font-bold uppercase tracking-wider">點擊查看建議</p>
                             </div>
                           </div>
                           <ArrowRight size={18} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
