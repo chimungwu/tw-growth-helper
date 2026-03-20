@@ -19,7 +19,9 @@ type Gender = 'boy' | 'girl';
 
 const ADVICE_TEXTS = {
   slow: "【長太慢組建議】\n強調脾胃運化、確保充足睡眠時間（晚上10點前入睡）與追趕生長。建議諮詢專業醫師評估生長激素或中醫調理。",
-  fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。"
+  fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。",
+  underweight: "【體重過輕建議】\n建議增加營養攝取，特別是優質蛋白質與健康油脂。若伴隨食慾不振，可考慮中醫調理脾胃，並排除寄生蟲或吸收不良等因素。",
+  overweight: "【體重過重建議】\n建議調整飲食結構，減少高糖、高油與加工食品。增加戶外運動量，並監測是否有代謝異常或性早熟風險。建議諮詢醫師或營養師進行體重管理。"
 };
 
 export default function App() {
@@ -172,15 +174,16 @@ export default function App() {
       if (diff < -15) {
         geneticComparison = '⚠️ 目前生長進度跑輸遺傳潛力。';
       } else if (diff > 15) {
-        geneticComparison = '🎉 目前生長進度跑贏遺傳潛力。';
+        geneticComparison = '🎉 目前生長進度跑贏遺傳潛力。 (⚠️ 需留意性早熟風險)';
       } else {
         geneticComparison = '符合遺傳預期。';
       }
     }
 
     const quadrant = checkGrowthQuadrant(gender, age, hRes.percentile);
+    const bmiAdvice = bmiCategory === "體重過輕" ? "underweight" : (bmiCategory === "體重過重" || bmiCategory === "肥胖" ? "overweight" : null);
 
-    return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant };
+    return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant, bmiAdvice };
   }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
 
   const inherited = useMemo(() => {
@@ -317,21 +320,36 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                   </div>
                 )}
 
-                {results.quadrant && (
-                  <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🔴</span>
-                      <span className="text-sm font-bold text-[#991B1B]">發育狀態提醒</span>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        const advice = results.quadrant === 'slow' ? ADVICE_TEXTS.slow : ADVICE_TEXTS.fast;
-                        alert(advice);
-                      }}
-                      className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
-                    >
-                      查看阿銘醫師建議
-                    </button>
+                {(results.quadrant || results.bmiAdvice) && (
+                  <div className="space-y-2">
+                    {results.quadrant && (
+                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🔴</span>
+                          <span className="text-sm font-bold text-[#991B1B]">發育狀態提醒</span>
+                        </div>
+                        <button 
+                          onClick={() => alert(ADVICE_TEXTS[results.quadrant as keyof typeof ADVICE_TEXTS])}
+                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
+                        >
+                          查看阿銘醫師建議
+                        </button>
+                      </div>
+                    )}
+                    {results.bmiAdvice && (
+                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">⚖️</span>
+                          <span className="text-sm font-bold text-[#991B1B]">體位狀態提醒</span>
+                        </div>
+                        <button 
+                          onClick={() => alert(ADVICE_TEXTS[results.bmiAdvice as keyof typeof ADVICE_TEXTS])}
+                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
+                        >
+                          查看阿銘醫師建議
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
