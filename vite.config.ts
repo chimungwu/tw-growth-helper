@@ -24,7 +24,7 @@ export default defineConfig(({mode}) => {
           skipWaiting: true
         },
         manifest: {
-          name: '台灣兒童生長曲線小幫手',
+          name: '生長曲線小幫手',
           short_name: '生長小幫手',
           description: '即時計算台灣兒童身高、體重百分位與 BMI，並預估成年目標身高。',
           theme_color: '#FDF8F3',
@@ -32,17 +32,17 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
           icons: [
             {
-              src: 'ICON.png',
+              src: '/ICON.png',
               sizes: '192x192',
               type: 'image/png'
             },
             {
-              src: 'ICON.png',
+              src: '/ICON.png',
               sizes: '512x512',
               type: 'image/png'
             },
             {
-              src: 'ICON.png',
+              src: '/ICON.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable'

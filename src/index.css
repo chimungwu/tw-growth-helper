@@ -5,11 +5,11 @@
   --font-display: "Outfit", "Inter", sans-serif;
   
   --color-bg: #FDF8F3;
-  --color-ink: #4A443F;
-  --color-ink-muted: #8B8279;
-  --color-accent: #D4A373;
-  --color-accent-soft: #E9D5C3;
-  --color-line: #E8E2DC;
+  --color-ink: #2D2A28;
+  --color-ink-muted: #6B645D;
+  --color-accent: #B8860B;
+  --color-accent-soft: #E0C9A6;
+  --color-line: #D1C9C1;
   
   --color-boy: #7FB3D5;
   --color-boy-soft: #EBF5FB;
@@ -41,7 +41,7 @@
   }
 
   .input-field {
-    @apply w-full bg-white/50 border-2 border-transparent focus:border-accent/20 focus:bg-white rounded-[24px] py-4 px-6 focus:ring-0 transition-all text-sm font-bold placeholder:text-[#C4BCB5] placeholder:font-normal;
+    @apply w-full bg-white border-2 border-line focus:border-accent focus:bg-white rounded-[24px] py-4 px-6 focus:ring-0 transition-all text-sm font-bold placeholder:text-ink/40 placeholder:font-normal;
   }
 
   .btn-primary {
