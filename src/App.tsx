@@ -877,7 +877,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                             <div className="h-1 w-12 bg-white/30 rounded-full overflow-hidden">
                               <div className="h-full bg-white w-2/3" />
                             </div>
-                            <p className="text-xs font-bold">遺傳範圍：{inherited.min.toFixed(1)} - {inherited.max.toFixed(1)}</p>
+                            <p className="text-xs font-bold">遺傳身高範圍：{inherited.min.toFixed(1)} - {inherited.max.toFixed(1)}</p>
                           </div>
                         </div>
                         <div className="w-20 h-20 bg-white/20 rounded-[32px] flex items-center justify-center backdrop-blur-md shadow-lg">
