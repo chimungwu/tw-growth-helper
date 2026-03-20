@@ -81,3 +81,35 @@ export function calculateInheritedHeight(gender: 'boy' | 'girl', fatherHeight: n
     max: inheritedHeight + range
   };
 }
+
+export function calculatePercentileFromValue(val: number, dataAtAge: Record<string, number>): number {
+  const p3 = dataAtAge[" 3rd"];
+  const p15 = dataAtAge["15th"];
+  const p25 = dataAtAge["25th"];
+  const p50 = dataAtAge["50th"];
+  const p75 = dataAtAge["75th"];
+  const p85 = dataAtAge["85th"];
+  const p97 = dataAtAge["97th"];
+
+  if (val <= p3) return interpolateValue(val, 0, p3, 0, 3);
+  if (val <= p15) return interpolateValue(val, p3, p15, 3, 15);
+  if (val <= p25) return interpolateValue(val, p15, p25, 15, 25);
+  if (val <= p50) return interpolateValue(val, p25, p50, 25, 50);
+  if (val <= p75) return interpolateValue(val, p50, p75, 50, 75);
+  if (val <= p85) return interpolateValue(val, p75, p85, 75, 85);
+  if (val <= p97) return interpolateValue(val, p85, p97, 85, 97);
+  return interpolateValue(val, p97, p97 + (p97 - p85), 97, 100);
+}
+
+export type GrowthQuadrant = 'slow' | 'fast' | null;
+
+export function checkGrowthQuadrant(gender: 'boy' | 'girl', age: number, heightPercentile: number): GrowthQuadrant {
+  if (gender === 'boy') {
+    if (heightPercentile < 15 && age > 11) return 'slow';
+    if (heightPercentile > 85 && age < 11) return 'fast';
+  } else {
+    if (heightPercentile < 15 && age > 9) return 'slow';
+    if (heightPercentile > 85 && age < 9) return 'fast';
+  }
+  return null;
+}

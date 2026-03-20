@@ -11,10 +11,16 @@ import {
 } from './data/growthData';
 import { 
   interpolateValue, findClosestIndices, calculateBMI, 
-  determineWeightCategory, calculateInheritedHeight 
+  determineWeightCategory, calculateInheritedHeight,
+  calculatePercentileFromValue, checkGrowthQuadrant, type GrowthQuadrant
 } from './utils/calculations';
 
 type Gender = 'boy' | 'girl';
+
+const ADVICE_TEXTS = {
+  slow: "【長太慢組建議】\n強調脾胃運化、確保充足睡眠時間（晚上10點前入睡）與追趕生長。建議諮詢專業醫師評估生長激素或中醫調理。",
+  fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。"
+};
 
 export default function App() {
   const [gender, setGender] = useState<Gender>('boy');
@@ -149,8 +155,33 @@ export default function App() {
     const bmi = calculateBMI(w, h);
     const bmiCategory = determineWeightCategory(bmi, age, gender);
 
-    return { hRes, wRes, bmi, bmiCategory };
-  }, [ageData, height, weight, gender]);
+    // Calculate Genetic Percentile (MPH Percentile)
+    let geneticPercentile = null;
+    let geneticComparison = '';
+    if (fatherHeight && motherHeight) {
+      const inherited = calculateInheritedHeight(gender, parseFloat(fatherHeight), parseFloat(motherHeight));
+      const adultData: Record<string, number> = {};
+      Object.keys(hData).forEach(key => {
+        if (key !== 'Age') {
+          adultData[key] = (hData as any)[key][hData.Age.length - 1];
+        }
+      });
+      geneticPercentile = calculatePercentileFromValue(inherited.median, adultData);
+      
+      const diff = hRes.percentile - geneticPercentile;
+      if (diff < -15) {
+        geneticComparison = '⚠️ 目前生長進度跑輸遺傳潛力。';
+      } else if (diff > 15) {
+        geneticComparison = '🎉 目前生長進度跑贏遺傳潛力。';
+      } else {
+        geneticComparison = '符合遺傳預期。';
+      }
+    }
+
+    const quadrant = checkGrowthQuadrant(gender, age, hRes.percentile);
+
+    return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant };
+  }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
 
   const inherited = useMemo(() => {
     if (!fatherHeight || !motherHeight) return null;
@@ -276,6 +307,33 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                     BMI: {results.bmi} <span className="px-2 py-0.5 bg-[#B8CDEE] rounded-full text-xs ml-2">{results.bmiCategory}</span>
                   </p>
                 </div>
+
+                {results.geneticComparison && (
+                  <div className="bg-white/50 p-3 rounded-2xl text-center">
+                    <p className="text-xs font-bold text-[#1E3A8A]">{results.geneticComparison}</p>
+                    {results.geneticPercentile !== null && (
+                      <p className="text-[10px] text-[#5B7CB2] mt-0.5">遺傳百分位: {results.geneticPercentile.toFixed(1)}%</p>
+                    )}
+                  </div>
+                )}
+
+                {results.quadrant && (
+                  <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🔴</span>
+                      <span className="text-sm font-bold text-[#991B1B]">發育狀態提醒</span>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        const advice = results.quadrant === 'slow' ? ADVICE_TEXTS.slow : ADVICE_TEXTS.fast;
+                        alert(advice);
+                      }}
+                      className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
+                    >
+                      查看阿銘醫師建議
+                    </button>
+                  </div>
+                )}
 
                 {inherited && (
                   <div className="bg-[#D1E2FF] p-4 rounded-2xl border border-[#B8CDEE]">
