@@ -14,6 +14,7 @@ import {
   determineWeightCategory, calculateInheritedHeight,
   calculatePercentileFromValue, checkGrowthQuadrant, type GrowthQuadrant
 } from './utils/calculations';
+import { Modal } from './components/Modal';
 
 type Gender = 'boy' | 'girl';
 
@@ -37,6 +38,11 @@ export default function App() {
   const [openQA, setOpenQA] = useState<number | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [modal, setModal] = useState<{ isOpen: boolean; title: string; content: string }>({
+    isOpen: false,
+    title: '',
+    content: ''
+  });
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -70,8 +76,20 @@ export default function App() {
       }
     } else {
       // iOS manual instruction
-      alert('請點擊瀏覽器下方的「分享」按鈕，然後選擇「加入主畫面」以安裝此應用程式。');
+      setModal({
+        isOpen: true,
+        title: '安裝說明',
+        content: '請點擊瀏覽器下方的「分享」按鈕，然後選擇「加入主畫面」以安裝此應用程式。'
+      });
     }
+  };
+
+  const openAdvice = (type: keyof typeof ADVICE_TEXTS, title: string) => {
+    setModal({
+      isOpen: true,
+      title,
+      content: ADVICE_TEXTS[type]
+    });
   };
 
   // Derived state: Age
@@ -214,7 +232,11 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
     `.trim();
 
     navigator.clipboard.writeText(text).then(() => {
-      alert('結果已複製到剪貼簿');
+      setModal({
+        isOpen: true,
+        title: '複製成功',
+        content: '結果已複製到剪貼簿'
+      });
     });
   };
 
@@ -240,6 +262,12 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
 
   return (
     <div className="min-h-screen bg-[#FDF8F3] text-[#4A443F] font-sans pb-12">
+      <Modal 
+        isOpen={modal.isOpen} 
+        onClose={() => setModal(prev => ({ ...prev, isOpen: false }))}
+        title={modal.title}
+        content={modal.content}
+      />
       {/* Header */}
       <header className="bg-white border-b border-[#E8E2DC] py-6 px-4 text-center sticky top-0 z-10 shadow-sm">
         <h1 className="text-2xl font-bold text-[#2D2926] tracking-tight flex items-center justify-center gap-2">
@@ -338,10 +366,10 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                           <span className="text-sm font-bold text-[#991B1B]">發育狀態提醒</span>
                         </div>
                         <button 
-                          onClick={() => alert(ADVICE_TEXTS[results.quadrant as keyof typeof ADVICE_TEXTS])}
+                          onClick={() => openAdvice(results.quadrant as keyof typeof ADVICE_TEXTS, "發育狀態建議")}
                           className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
                         >
-                          查看阿銘醫師建議
+                          查看建議
                         </button>
                       </div>
                     )}
@@ -352,10 +380,10 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                           <span className="text-sm font-bold text-[#991B1B]">體位狀態提醒</span>
                         </div>
                         <button 
-                          onClick={() => alert(ADVICE_TEXTS[results.bmiAdvice as keyof typeof ADVICE_TEXTS])}
+                          onClick={() => openAdvice(results.bmiAdvice as keyof typeof ADVICE_TEXTS, "體位狀態建議")}
                           className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
                         >
-                          查看阿銘醫師建議
+                          查看建議
                         </button>
                       </div>
                     )}
@@ -366,10 +394,10 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                           <span className="text-sm font-bold text-[#991B1B]">遺傳潛力提醒</span>
                         </div>
                         <button 
-                          onClick={() => alert(ADVICE_TEXTS[results.geneticAdvice as keyof typeof ADVICE_TEXTS])}
+                          onClick={() => openAdvice(results.geneticAdvice as keyof typeof ADVICE_TEXTS, "遺傳潛力建議")}
                           className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
                         >
-                          查看阿銘醫師建議
+                          查看建議
                         </button>
                       </div>
                     )}
