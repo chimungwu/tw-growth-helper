@@ -21,7 +21,8 @@ const ADVICE_TEXTS = {
   slow: "【長太慢組建議】\n強調脾胃運化、確保充足睡眠時間（晚上10點前入睡）與追趕生長。建議諮詢專業醫師評估生長激素或中醫調理。",
   fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。",
   underweight: "【體重過輕建議】\n建議增加營養攝取，特別是優質蛋白質與健康油脂。若伴隨食慾不振，可考慮中醫調理脾胃，並排除寄生蟲或吸收不良等因素。",
-  overweight: "【體重過重建議】\n建議調整飲食結構，減少高糖、高油與加工食品。增加戶外運動量，並監測是否有代謝異常或性早熟風險。建議諮詢醫師或營養師進行體重管理。"
+  overweight: "【體重過重建議】\n建議調整飲食結構，減少高糖、高油與加工食品。增加戶外運動量，並監測是否有代謝異常或性早熟風險。建議諮詢醫師或營養師進行體重管理。",
+  genetic_fast: "【生長超前建議】\n目前生長進度大幅超越遺傳潛力，這可能是「性早熟」的徵兆。建議監測骨齡，確認生長板是否提早閉合，並減少環境荷爾蒙接觸。若身高突然衝高但伴隨第二性徵出現，請務必諮詢專業醫師。"
 };
 
 export default function App() {
@@ -182,8 +183,9 @@ export default function App() {
 
     const quadrant = checkGrowthQuadrant(gender, age, hRes.percentile);
     const bmiAdvice = bmiCategory === "體重過輕" ? "underweight" : (bmiCategory === "體重過重" || bmiCategory === "肥胖" ? "overweight" : null);
+    const geneticAdvice = (hRes.percentile - (geneticPercentile || 0)) > 15 ? "genetic_fast" : null;
 
-    return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant, bmiAdvice };
+    return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant, bmiAdvice, geneticAdvice };
   }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
 
   const inherited = useMemo(() => {
@@ -320,7 +322,7 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                   </div>
                 )}
 
-                {(results.quadrant || results.bmiAdvice) && (
+                {(results.quadrant || results.bmiAdvice || results.geneticAdvice) && (
                   <div className="space-y-2">
                     {results.quadrant && (
                       <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
@@ -344,6 +346,20 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                         </div>
                         <button 
                           onClick={() => alert(ADVICE_TEXTS[results.bmiAdvice as keyof typeof ADVICE_TEXTS])}
+                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
+                        >
+                          查看阿銘醫師建議
+                        </button>
+                      </div>
+                    )}
+                    {results.geneticAdvice && (
+                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🧬</span>
+                          <span className="text-sm font-bold text-[#991B1B]">遺傳潛力提醒</span>
+                        </div>
+                        <button 
+                          onClick={() => alert(ADVICE_TEXTS[results.geneticAdvice as keyof typeof ADVICE_TEXTS])}
                           className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
                         >
                           查看阿銘醫師建議
