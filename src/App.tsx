@@ -56,7 +56,6 @@ export default function App() {
   const [showMedian, setShowMedian] = useState(false);
   const [showParents, setShowParents] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [errors, setErrors] = useState<{ birthdate?: string, height?: string, weight?: string }>({});
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const [openQA, setOpenQA] = useState<number | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -271,34 +270,7 @@ export default function App() {
   }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
 
   useEffect(() => {
-    const newErrors: { birthdate?: string, height?: string, weight?: string } = {};
-
-    if (birthdateInput) {
-      const numericAge = parseFloat(birthdateInput);
-      const isAge = !isNaN(numericAge) && birthdateInput.length < 7 && numericAge >= 0 && numericAge <= 18.5;
-      const isDate = /^\d{8}$/.test(birthdateInput.replace(/\//g, '')) || /^\d{7}$/.test(birthdateInput.replace(/\//g, ''));
-      if (!isAge && !isDate) {
-        newErrors.birthdate = "格式不正確，請輸入 YYYYMMDD 或年齡 (0-18.5)";
-      }
-    }
-
-    if (height) {
-      const h = parseFloat(height);
-      if (isNaN(h) || h < 50 || h > 190) {
-        newErrors.height = "請輸入合理的身高數值 (50-190 cm)";
-      }
-    }
-
-    if (weight) {
-      const w = parseFloat(weight);
-      if (isNaN(w) || w < 10 || w > 100) {
-        newErrors.weight = "請輸入合理的體重數值 (10-100 kg)";
-      }
-    }
-
-    setErrors(newErrors);
-
-    if ((birthdateInput || height || weight) && Object.keys(newErrors).length === 0) {
+    if (birthdateInput || height || weight) {
       setIsCalculating(true);
       const timer = setTimeout(() => setIsCalculating(false), 400);
       return () => clearTimeout(timer);
@@ -494,9 +466,8 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                       placeholder="例如：20150620 或 8.5"
                       value={birthdateInput}
                       onChange={(e) => setBirthdateInput(e.target.value)}
-                      className={`input-field pl-16 pr-8 ${errors.birthdate ? 'border-red-500' : ''}`}
+                      className="input-field pl-16 pr-8"
                     />
-                    {errors.birthdate && <p className="text-xs text-red-500 mt-1 ml-2">{errors.birthdate}</p>}
                   </div>
                 </div>
 
@@ -513,9 +484,8 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                         placeholder="120.5"
                         value={height}
                         onChange={(e) => setHeight(e.target.value)}
-                        className={`input-field pl-16 pr-6 ${errors.height ? 'border-red-500' : ''}`}
+                        className="input-field pl-16 pr-6"
                       />
-                      {errors.height && <p className="text-xs text-red-500 mt-1 ml-2">{errors.height}</p>}
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -527,12 +497,11 @@ ${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherit
                       <input 
                         type="number"
                         step="0.1"
-                        placeholder="50.0"
+                        placeholder="25.0"
                         value={weight}
                         onChange={(e) => setWeight(e.target.value)}
-                        className={`input-field pl-16 pr-6 ${errors.weight ? 'border-red-500' : ''}`}
+                        className="input-field pl-16 pr-6"
                       />
-                      {errors.weight && <p className="text-xs text-red-500 mt-1 ml-2">{errors.weight}</p>}
                     </div>
                   </div>
                 </div>
