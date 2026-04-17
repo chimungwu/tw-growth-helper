@@ -7,6 +7,7 @@
  */
 import { createPortal } from 'react-dom';
 import React, { useState, useEffect, useMemo } from 'react';
+<<<<<<< Updated upstream
 import { 
   RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, Scale,
   User, UserPlus, ExternalLink, Calendar, Ruler, Weight, Activity, Dna,
@@ -14,6 +15,9 @@ import {
   CheckCircle2, AlertTriangle, RefreshCcw, Target, AlertCircle,
   Facebook, X, Sprout, SlidersHorizontal, Settings2, Bone, TrendingUp, TrendingDown,
 } from 'lucide-react';
+=======
+import { RefreshCw, Copy, Download, HelpCircle, ChevronDown, ChevronUp, User, UserPlus } from 'lucide-react';
+>>>>>>> Stashed changes
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   boyWeightData, boyHeightData, girlWeightData, girlHeightData 
@@ -25,7 +29,6 @@ import {
   calculateBoneAgePredictedHeight, calculateBoneAgeDeviation, type BoneAgeDeviation,
   type MaturityCategory
 } from './utils/calculations';
-import { Modal } from './components/Modal';
 
 type Gender = 'boy' | 'girl';
 type TannerStage = 0 | 1 | 2 | 3;
@@ -44,6 +47,7 @@ type PubertyAssessment = {
 };
 
 const ADVICE_TEXTS = {
+<<<<<<< Updated upstream
   underweight: "【體重偏輕建議】\n建議加強均衡飲食，特別是優質蛋白質、足夠熱量與健康油脂的攝取。若同時有食慾差、容易疲倦、腸胃吸收不佳或生長落後等情況，建議進一步評估營養狀態與相關生理因素，必要時可尋求專業中、西醫師協助。",
   overweight: "【體重偏重建議】\n建議調整飲食內容，減少高糖、高油與加工食品，並增加日常活動量與規律運動。若體重持續上升，需留意代謝異常、骨齡超前與性早熟風險，建議由中、西醫師或營養師協助管理。",
   genetic_fast: "【生長表現高於遺傳預期】\n目前身高百分位明顯高於遺傳目標範圍（落差超過 15%），代表現階段生長速度較快。這不一定異常，但仍建議結合骨齡、成長速度與第二性徵發育情況一起判讀，以排除性早熟或骨齡過度超前的可能。",
@@ -55,6 +59,12 @@ const ADVICE_TEXTS = {
   extreme_low: "【生長遲緩風險提醒】\n預估身高明顯低於遺傳潛力，建議進一步評估是否存在生長速度不足、骨齡異常、營養問題或內分泌因素。建議由小兒內分泌科醫師或相關專業中、西醫師進行進一步判讀。",
   th_formula: "【關於遺傳目標身高（TH）】\n遺傳目標身高（Target Height, TH）是依據父母身高推估孩子可能的成年身高區間，屬於 mid-parental height 的臨床估算方法，最早由 Tanner 等學者提出。\n\n● 男孩：(父親身高 + 母親身高 + 13) ÷ 2\n● 女孩：(父親身高 + 母親身高 - 13) ÷ 2\n\n臨床上，多數孩子的最終身高通常會落在遺傳目標約 ±8–10 cm 的範圍內。\n\n進一步觀察台灣孩童常見的變異範圍為：\n● 男孩：約 ±7.5 cm\n● 女孩：約 ±6 cm\n\n實際評估仍需考量個體差異（如青春期時機、營養、睡眠與生長速度等），因此建議結合生長曲線、骨齡與年生長速度綜合判讀。\n\n需注意的是，TH 反映的是先天遺傳潛力，並非最終身高的精準預測值。",
   bp_standard: "【關於 BP 預估模型與熟成度判別】\n本系統採用 Bayley–Pinneau（BP）預估模型，並依據骨齡與實際年齡的差距，選用相對應的熟成度參考表。\n\n● 早熟（Accelerated）：骨齡較實際年齡超前 1 歲（含）以上。\n● 晚熟（Retarded）：骨齡較實際年齡落後 1 歲（含）以上。\n● 平均（Average）：骨齡與實際年齡差距小於 1 歲。\n\n需注意的是，BP 模型主要提供趨勢參考，實際判讀仍應結合遺傳目標身高、青春期發育狀態、年生長速度與臨床評估綜合判斷。",
+=======
+  slow: "【長太慢組建議】\n強調脾胃運化、確保充足睡眠時間（晚上10點前入睡）與追趕生長。建議諮詢專業醫師評估生長激素或中醫調理。",
+  fast: "【衝太快組建議】\n提醒監測骨齡、減少環境賀爾蒙（如塑化劑）、控管 BMI 避免過重，以預防性早熟導致生長板提早閉合。",
+  underweight: "【體重過輕建議】\n建議增加營養攝取，特別是優質蛋白質與健康油脂。若伴隨食慾不振，可考慮中醫調理脾胃，並排除寄生蟲或吸收不良等因素。",
+  overweight: "【體重過重建議】\n建議調整飲食結構，減少高糖、高油與加工食品。增加戶外運動量，並監測是否有代謝異常或性早熟風險。建議諮詢醫師或營養師進行體重管理。"
+>>>>>>> Stashed changes
 };
 
 export default function App() {
@@ -78,11 +88,16 @@ export default function App() {
   const [isCalculating, setIsCalculating] = useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const [openQA, setOpenQA] = useState<number | null>(null);
+<<<<<<< Updated upstream
   const [modal, setModal] = useState<{ isOpen: boolean; title: string; content: string }>({
     isOpen: false,
     title: '',
     content: ''
   });
+=======
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+>>>>>>> Stashed changes
 
   const weeksError =
     gestationalWeeks !== '' &&
@@ -95,6 +110,7 @@ export default function App() {
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
 
+<<<<<<< Updated upstream
   // --- 1. ⚡ 優先抓取姓名 (原本漏掉的這味藥補上去) ---
   const n = params.get('n');
   if (n) setChildName(n);
@@ -108,10 +124,37 @@ useEffect(() => {
     const numericVal = Number(val);
     if (numericVal >= min && numericVal <= max) {
       return val;
+=======
+    // Check if it's iOS and not standalone
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    
+    if (isIOS && !isStandalone) {
+      setShowInstallBanner(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setShowInstallBanner(false);
+      }
+    } else {
+      // iOS manual instruction
+      alert('請點擊瀏覽器下方的「分享」按鈕，然後選擇「加入主畫面」以安裝此應用程式。');
+>>>>>>> Stashed changes
     }
     return null;
   };
 
+<<<<<<< Updated upstream
   // --- 2. 開始執行抓取與驗證 (完全保留你的範圍限制) ---
 
   const g = params.get('g');
@@ -271,6 +314,11 @@ const openAdvice = (type: keyof typeof ADVICE_TEXTS, title: string) => {
     const isAlert = Math.abs(diff) > 15;
     const directionLabel = diff > 5 ? '高於基準身高' : diff < -5 ? '低於基準身高' : '接近基準身高';
     const directionColor = diff > 5 ? 'text-rose-600' : diff < -5 ? 'text-blue-600' : 'text-emerald-600';
+=======
+  // Derived state: Age
+  const ageData = useMemo(() => {
+    if (!birthdateInput) return null;
+>>>>>>> Stashed changes
 
     return (
       <div className="space-y-4">
@@ -735,9 +783,15 @@ const getInterpolatedP = (data: any, val: number) => {
       
       const diff = hRes.percentile - geneticPercentile;
       if (diff < -15) {
+<<<<<<< Updated upstream
         geneticComparison = '⚠️ 根據 Tanner 遺傳模型預估，目前生長曲線有偏離現象（落後），建議諮詢專業中西醫調養。';
       } else if (diff > 15) {
         geneticComparison = '⚠️ 根據 Tanner 遺傳模型預估，目前生長曲線有偏離現象（超前），需留意性早熟風險，建議諮詢專業中西醫調養。';
+=======
+        geneticComparison = '⚠️ 目前生長進度跑輸遺傳潛力。';
+      } else if (diff > 15) {
+        geneticComparison = '🎉 目前生長進度跑贏遺傳潛力。 (⚠️ 需留意性早熟風險)';
+>>>>>>> Stashed changes
       } else {
         geneticComparison = '符合遺傳預期。';
       }
@@ -751,14 +805,8 @@ const getInterpolatedP = (data: any, val: number) => {
         : getPercentilePubertyAssessment(gender, age, hRes.percentile);
 
     const bmiAdvice = bmiCategory === "體重過輕" ? "underweight" : (bmiCategory === "體重過重" || bmiCategory === "肥胖" ? "overweight" : null);
-    
-    let geneticAdvice: keyof typeof ADVICE_TEXTS | null = null;
-    if (geneticPercentile !== null) {
-      const diff = hRes.percentile - geneticPercentile;
-      if (diff > 15) geneticAdvice = "genetic_fast";
-      else if (diff < -15) geneticAdvice = "genetic_slow";
-    }
 
+<<<<<<< Updated upstream
     return {
       hRes,
       wRes,
@@ -776,12 +824,17 @@ const getInterpolatedP = (data: any, val: number) => {
     };
   }, [ageForCalculation, ageData, height, weight, gender, fatherHeight, motherHeight, boneAge, manualMaturity, tannerStage, isCalculating]);
 
+=======
+    return { hRes, wRes, bmi, bmiCategory, geneticPercentile, geneticComparison, quadrant, bmiAdvice };
+  }, [ageData, height, weight, gender, fatherHeight, motherHeight]);
+>>>>>>> Stashed changes
 
   const inherited = useMemo(() => {
     if (!fatherHeight || !motherHeight) return null;
     return calculateInheritedHeight(gender, parseFloat(fatherHeight), parseFloat(motherHeight));
   }, [gender, fatherHeight, motherHeight]);
 
+<<<<<<< Updated upstream
   const formatPercentile = (p: number) => {
     if (p < 3) return { text: '< 3rd', isExtreme: true };
     if (p > 97) return { text: '> 97th', isExtreme: true };
@@ -894,12 +947,30 @@ ${pahText}
       isOpen: true,
       title: '複製成功',
       content: `幫 ${displayName} 準備的分析結果（含矯正年齡對照）已複製到剪貼簿！`
+=======
+  const copyResults = () => {
+    if (!results || !ageData) return;
+    const text = `
+【台灣兒童生長曲線小幫手】
+性別：${gender === 'boy' ? '男孩' : '女孩'}
+年齡：${ageData.display}
+身高：${height} cm (百分位: ${results.hRes.percentile.toFixed(1)})
+體重：${weight} kg (百分位: ${results.wRes.percentile.toFixed(1)})
+BMI：${results.bmi} (${results.bmiCategory})
+${inherited ? `預估目標身高：${inherited.median.toFixed(1)} cm (${inherited.min.toFixed(1)} - ${inherited.max.toFixed(1)})` : ''}
+日期：${new Date().toLocaleDateString('zh-TW')}
+    `.trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+      alert('結果已複製到剪貼簿');
+>>>>>>> Stashed changes
     });
   });
 };
 
  const exportCSV = () => {
     if (!results || !ageData) return;
+<<<<<<< Updated upstream
     const hP = formatPercentile(results.hRes.percentile).text;
     const wP = formatPercentile(results.wRes.percentile).text;
 
@@ -940,6 +1011,10 @@ ${pahText}
       boneAgeValue,
       pahValue
     ].join(',') + "\n";
+=======
+    const headers = "\uFEFF日期,性別,年齡,身高(cm),身高百分位,體重(kg),體重百分位,BMI,BMI判定\n";
+    const row = `${new Date().toLocaleDateString('zh-TW')},${gender === 'boy' ? '男' : '女'},${ageData.display},${height},${results.hRes.percentile.toFixed(1)},${weight},${results.wRes.percentile.toFixed(1)},${results.bmi},${results.bmiCategory}\n`;
+>>>>>>> Stashed changes
     
     const blob = new Blob([headers + row], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -954,6 +1029,7 @@ ${pahText}
     URL.revokeObjectURL(url);
   };
 
+<<<<<<< Updated upstream
 const qaData = [
   { 
     q: "認識設計者：吳啓銘醫師｜仨寶爸中醫博士", 
@@ -1071,6 +1147,25 @@ const qaData = [
         基於台灣本土數據，守護孩子健康成長。
       </p>
     </div>
+=======
+  const qaData = [
+    { q: "這個工具的資料來源是什麼？", a: "引用自陳偉德醫師與張美惠醫師於 2010 年發表的台灣本土研究，該研究根據 WHO 標準制定新的兒童與青少年成長曲線。" },
+    { q: "BMI 百分位的標準是依據哪個單位？", a: "採用衛福部國健署於 102 年公告的台灣兒童與青少年體位判定參考值。" },
+    { q: "如何計算孩子未來的預估成年身高？", a: "使用 Tanner 等學者提出的 Target Height 公式。男孩：(父+母+13)/2；女孩：(父+母-13)/2。" },
+    { q: "這個工具適合哪些人使用？", a: "提供給家長、中醫師、小兒科醫師參考。所有數據僅供參考，若有疑問請諮詢專業醫療人員。" }
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#FDF8F3] text-[#4A443F] font-sans pb-12">
+      {/* Header */}
+      <header className="bg-white border-b border-[#E8E2DC] py-6 px-4 text-center sticky top-0 z-10 shadow-sm">
+        <h1 className="text-2xl font-bold text-[#2D2926] tracking-tight flex items-center justify-center gap-2">
+          <UserPlus className="text-[#D4A373]" />
+          台灣兒童生長曲線小幫手
+        </h1>
+        <p className="text-sm text-[#8B837C] mt-1">專業、精確的成長追蹤工具</p>
+      </header>
+>>>>>>> Stashed changes
 
     {/* 右側 QR Code 區：只在電腦版顯示，不佔用垂直空間 */}
     <motion.div 
@@ -1256,6 +1351,7 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
           </p>
         )}
 
+<<<<<<< Updated upstream
 <p className="text-sm font-semibold text-blue-700 leading-relaxed ml-2 bg-blue-50 p-2 rounded-lg border border-blue-200 flex items-center gap-2">
   <Info size={16} className="text-blue-400" />
   未滿 3 歲的早產兒，生長評估通常需參考矯正年齡。
@@ -1362,6 +1458,68 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
             </div>
           </div>
         </div>
+=======
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/50 p-3 rounded-2xl">
+                    <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">身高百分位</p>
+                    <p className="text-2xl font-black text-[#1E3A8A]">{results.hRes.percentile.toFixed(1)}%</p>
+                    <p className="text-[10px] text-[#5B7CB2] mt-1">{height} cm</p>
+                  </div>
+                  <div className="bg-white/50 p-3 rounded-2xl">
+                    <p className="text-xs text-[#5B7CB2] uppercase font-bold tracking-wider">體重百分位</p>
+                    <p className="text-2xl font-black text-[#1E3A8A]">{results.wRes.percentile.toFixed(1)}%</p>
+                    <p className="text-[10px] text-[#5B7CB2] mt-1">{weight} kg</p>
+                  </div>
+                </div>
+
+                <div className="bg-white/80 p-4 rounded-2xl text-center">
+                  <p className="text-sm font-bold text-[#1E3A8A]">
+                    BMI: {results.bmi} <span className="px-2 py-0.5 bg-[#B8CDEE] rounded-full text-xs ml-2">{results.bmiCategory}</span>
+                  </p>
+                </div>
+
+                {results.geneticComparison && (
+                  <div className="bg-white/50 p-3 rounded-2xl text-center">
+                    <p className="text-xs font-bold text-[#1E3A8A]">{results.geneticComparison}</p>
+                    {results.geneticPercentile !== null && (
+                      <p className="text-[10px] text-[#5B7CB2] mt-0.5">遺傳百分位: {results.geneticPercentile.toFixed(1)}%</p>
+                    )}
+                  </div>
+                )}
+
+                {(results.quadrant || results.bmiAdvice) && (
+                  <div className="space-y-2">
+                    {results.quadrant && (
+                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🔴</span>
+                          <span className="text-sm font-bold text-[#991B1B]">發育狀態提醒</span>
+                        </div>
+                        <button 
+                          onClick={() => alert(ADVICE_TEXTS[results.quadrant as keyof typeof ADVICE_TEXTS])}
+                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
+                        >
+                          查看阿銘醫師建議
+                        </button>
+                      </div>
+                    )}
+                    {results.bmiAdvice && (
+                      <div className="bg-[#FFF5F5] border border-[#FECACA] p-4 rounded-2xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">⚖️</span>
+                          <span className="text-sm font-bold text-[#991B1B]">體位狀態提醒</span>
+                        </div>
+                        <button 
+                          onClick={() => alert(ADVICE_TEXTS[results.bmiAdvice as keyof typeof ADVICE_TEXTS])}
+                          className="bg-[#991B1B] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-[#7F1D1D] transition-colors"
+                        >
+                          查看阿銘醫師建議
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+>>>>>>> Stashed changes
 
 {/* 💉 阿銘醫師補方：琥珀色醒目版 */}
 {(!ageData || (ageData && ageData.years < 8)) && (
@@ -2198,6 +2356,7 @@ const summaryRows = [
                       exit={{ height: 0, opacity: 0 }}
                       className="px-10 pb-10"
                     >
+<<<<<<< Updated upstream
                       <div className="pt-4 text-base text-slate-500 font-bold leading-relaxed space-y-6 whitespace-pre-line">
                         {item.a}
                         {item.link && (
@@ -2214,6 +2373,9 @@ const summaryRows = [
                           </motion.a>
                         )}
                       </div>
+=======
+                      {item.a}
+>>>>>>> Stashed changes
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -2221,6 +2383,21 @@ const summaryRows = [
             ))}
           </div>
         </div>
+<<<<<<< Updated upstream
+=======
+
+        {/* Footer */}
+        <footer className="text-center space-y-4 pt-8">
+          <div className="inline-block bg-white px-6 py-4 rounded-3xl border border-[#E8E2DC] shadow-sm">
+            <p className="text-xs text-[#8B837C]">
+              程式維護：<a href="https://www.facebook.com/profile.php?id=61557246475372" target="_blank" className="text-[#D4A373] font-bold hover:underline">仨寶爸中醫博士吳啓銘</a>
+            </p>
+          </div>
+          <p className="text-[10px] text-[#C4BCB5] uppercase tracking-widest">
+            Version 2026.03.20 ver.20
+          </p>
+        </footer>
+>>>>>>> Stashed changes
       </main>
 
       {/* Footer */}
