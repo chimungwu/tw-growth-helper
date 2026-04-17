@@ -1,7 +1,10 @@
 {
   "name": "tw-growth-helper",
   "private": true,
-  "version": "0.0.0",
+  "version": "3.0.0",
+  "description": "台灣兒童生長曲線與發育評估小幫手 - 阿銘醫師開發",
+  "author": "Dr. Wu Chi-Ming (阿銘醫師)",
+  "license": "CC-BY-NC-4.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",

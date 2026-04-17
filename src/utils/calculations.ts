@@ -1,9 +1,66 @@
 
 import { boyBMIData, girlBMIData } from '../data/growthData';
+import { boyBoneAgeTable, girlBoneAgeTable } from '../data/boneAgeData';
 
 export function interpolateValue(value: number, x1: number, x2: number, y1: number, y2: number): number {
   if (x1 === x2) return y1;
   return y1 + ((value - x1) * (y2 - y1)) / (x2 - x1);
+}
+
+export type MaturityCategory = 'accelerated' | 'average' | 'retarded';
+
+export function calculateBoneAgePredictedHeight(
+  gender: 'boy' | 'girl', 
+  boneAge: number, 
+  chronologicalAge: number, 
+  currentHeight: number,
+  manualMaturity?: MaturityCategory
+): number | null {
+  const tables = gender === 'boy' ? boyBoneAgeTable : girlBoneAgeTable;
+  
+  // Determine which table to use based on maturity
+  let table: Record<number, number>;
+  
+  if (manualMaturity) {
+    table = tables[manualMaturity];
+  } else {
+    const diff = boneAge - chronologicalAge;
+    if (diff >= 1) {
+      table = tables.accelerated;
+    } else if (diff <= -1) {
+      table = tables.retarded;
+    } else {
+      table = tables.average;
+    }
+  }
+
+  const ages = Object.keys(table).map(Number).sort((a, b) => a - b);
+  
+  if (boneAge < ages[0] || boneAge > ages[ages.length - 1]) {
+    // If bone age is out of range, we can't accurately predict using this table
+    // But for bone age 18+, it's 100%
+    if (boneAge >= 18) return currentHeight;
+    return null;
+  }
+
+  let lowerIndex = -1;
+  let upperIndex = -1;
+  for (let i = 0; i < ages.length; i++) {
+    if (ages[i] <= boneAge) lowerIndex = i;
+    if (ages[i] >= boneAge && upperIndex === -1) upperIndex = i;
+  }
+
+  if (lowerIndex === -1 || upperIndex === -1) return null;
+
+  const percentage = interpolateValue(
+    boneAge,
+    ages[lowerIndex],
+    ages[upperIndex],
+    table[ages[lowerIndex]],
+    table[ages[upperIndex]]
+  );
+
+  return (currentHeight / percentage) * 100;
 }
 
 export function findClosestIndices(value: number, array: number[]): [number, number] {
@@ -112,4 +169,17 @@ export function checkGrowthQuadrant(gender: 'boy' | 'girl', age: number, heightP
     if (heightPercentile > 85 && age < 9) return 'fast';
   }
   return null;
+}
+
+export type BoneAgeDeviation = 'extreme_high' | 'high' | 'normal' | 'low' | 'extreme_low' | null;
+
+export function calculateBoneAgeDeviation(predictedHeight: number | null, inheritedMin: number, inheritedMax: number): BoneAgeDeviation {
+  if (predictedHeight === null) return null;
+  
+  if (predictedHeight > inheritedMax + 5) return 'extreme_high';
+  if (predictedHeight > inheritedMax) return 'high';
+  if (predictedHeight < inheritedMin - 5) return 'extreme_low';
+  if (predictedHeight < inheritedMin) return 'low';
+  
+  return 'normal';
 }

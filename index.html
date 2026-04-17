@@ -1,17 +1,66 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>台灣兒童生長曲線小幫手</title>
-    <meta name="description" content="即時計算台灣兒童身高、體重百分位與 BMI，並預估成年目標身高。">
+    
+    <title>兒童成長小幫手 v3.0｜阿銘醫師：台灣生長曲線、骨齡預估與遺傳身高計算</title>
+    <meta name="description" content="由中醫博士阿銘醫師開發，結合衛福部本土成長數據。提供精準兒童身高體重百分位計算、BMI 體位判定、遺傳身高 (TH) 與 Bayley-Pinneau 骨齡預估 (PAH)，精準掌握發育風險。">
+    <meta name="keywords" content="兒童成長曲線, 身高預估, 骨齡預估, 阿銘醫師, 遺傳身高, 成長百分位計算, 台灣兒童生長標準">
+    <meta name="author" content="阿銘醫師 (Dr. Wu Chi-Ming)">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "兒童成長小幫手 v3.0",
+      "url": "https://chimungwu.github.io/tw-growth-helper/",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "author": {
+        "@type": "Person",
+        "name": "吳啓銘",
+        "alternateName": "阿銘醫師",
+        "jobTitle": "中醫博士 / 醫師",
+        "url": "https://drwu.carrd.co/"
+      },
+      "description": "專業台灣兒童生長曲線計算器，整合 BMI 判定與骨齡身高預估模型。",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "TWD"
+      }
+    }
+    </script>
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chimungwu.github.io/tw-growth-helper/">
+    <meta property="og:title" content="🦒 兒童成長小幫手 v3.0 - 守護孩子的生長黃金期">
+    <meta property="og:description" content="即時計算生長百分位、BMI，並結合骨齡與遺傳預估未來身高。中醫博士專業導航，隱私安全免下載。">
+    <meta property="og:image" content="https://chimungwu.github.io/tw-growth-helper/apple-icon.png">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="兒童成長小幫手 - 阿銘醫師">
+    <meta property="twitter:description" content="專業的台灣兒童生長評估工具，整合臨床骨齡預估模型。">
+
     <meta name="theme-color" content="#FDF8F3">
-    <link rel="apple-touch-icon" href="ICON.png">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="兒童成長小幫手">
+    
+    <link rel="icon" href="/tw-growth-helper/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/tw-growth-helper/apple-icon.png">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1TCWMZ52LN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1TCWMZ52LN');
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

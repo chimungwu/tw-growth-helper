@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        #og-image {
+            width: 1200px;
+            height: 630px;
+            background-color: #FDF8F3;
+            display: flex;
+            font-family: "Noto Sans TC", sans-serif;
+            position: relative;
+            box-sizing: border-box;
+        }
+        /* 左側文案 */
+        .left-panel {
+            flex: 1.2;
+            padding: 80px 0 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .main-title {
+            font-size: 80px;
+            font-weight: 900;
+            color: #1E293B;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .version {
+            font-size: 36px;
+            color: #64748b;
+            font-weight: 400;
+            margin-top: 10px;
+        }
+        .sub-title {
+            font-size: 44px;
+            font-weight: 700;
+            color: #F97316;
+            margin: 20px 0 40px 0;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-item {
+            font-size: 32px;
+            color: #334155;
+            margin-bottom: 22px; /* 增加行距，確保不重疊 */
+            display: flex;
+            align-items: center;
+        }
+        .check {
+            color: #10B981;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        /* 右側視覺 */
+        .right-panel {
+            flex: 0.8;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 長頸鹿圖案 */
+        .giraffe {
+            width: 400px;
+            height: 400px;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+        }
+        /* 底部專業章：移到最下方，不再擋字 */
+        .doctor-badge {
+            position: absolute;
+            bottom: 40px;
+            left: 80px;
+            background-color: rgba(255, 237, 213, 0.9);
+            color: #C2410C;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 26px;
+            font-weight: 900;
+            border: 2px solid #FFEDD5;
+        }
+    </style>
+</head>
+<body>
+    <div id="og-image">
+        <div class="left-panel">
+            <h1 class="main-title">🦒 兒童成長小幫手</h1>
+            <div class="version">v3.0</div>
+            <p class="sub-title">守護孩子的生長黃金期</p>
+            <ul class="feature-list">
+                <li class="feature-item"><span class="check">✓</span> 台灣本土生長曲線 (衛福部標準)</li>
+                <li class="feature-item"><span class="check">✓</span> BMI 體位判定與健康建議</li>
+                <li class="feature-item"><span class="check">✓</span> TH 遺傳身高 & PAH 骨齡預估</li>
+                <li class="feature-item"><span class="check">✓</span> 五級發育風險預警 (性早熟/遲緩)</li>
+            </ul>
+        </div>
+        <div class="doctor-badge">
+            阿銘醫師｜仨寶爸中醫博士 專業設計
+        </div>
+        <div class="right-panel">
+            <svg class="giraffe" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="90" fill="#E2E8F0" opacity="0.3"/>
+                <path d="M80,40 L120,40 L115,160 L85,160 Z" fill="#FBBF24"/>
+                <circle cx="100" cy="50" r="35" fill="#FBBF24"/>
+                <circle cx="85" cy="45" r="5" fill="#1E293B"/>
+                <circle cx="115" cy="45" r="5" fill="#1E293B"/>
+                <path d="M90,65 Q100,75 110,65" stroke="#1E293B" stroke-width="3" fill="none"/>
+                <rect x="92" y="100" width="16" height="16" rx="4" fill="#B45309"/>
+                <rect x="95" y="130" width="12" height="12" rx="3" fill="#B45309"/>
+            </svg>
+        </div>
+    </div>
+</body>
+</html>

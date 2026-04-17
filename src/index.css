@@ -3,52 +3,58 @@
 @theme {
   --font-sans: "Inter", "Noto Sans TC", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
   
-  --color-bg: #FDF8F3;
-  --color-ink: #4A443F;
-  --color-ink-muted: #8B8279;
-  --color-accent: #D4A373;
-  --color-accent-soft: #E9D5C3;
-  --color-line: #E8E2DC;
+  --color-bg: #F8F9FA;
+  --color-ink: #0F172A;
+  --color-ink-muted: #475569;
+  --color-accent: #2563EB;
+  --color-accent-soft: #EFF6FF;
+  --color-line: #E2E8F0;
   
-  --color-boy: #7FB3D5;
-  --color-boy-soft: #EBF5FB;
-  --color-girl: #F1948A;
-  --color-girl-soft: #FDEDEC;
+  --color-boy: #0284C7;
+  --color-boy-soft: #F0F9FF;
+  --color-girl: #DB2777;
+  --color-girl-soft: #FDF2F8;
+
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
+  --radius-5xl: 48px;
 }
 
 @layer base {
   body {
-    @apply bg-bg text-ink selection:bg-accent/20;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3FfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3F/filter%3E%3Frect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3F/svg%3E");
-    background-attachment: fixed;
-    background-size: 200px 200px;
-    opacity: 0.98;
+    @apply bg-bg text-ink selection:bg-accent/10 antialiased;
+    font-size: 16px;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-accent/5;
+    @apply bg-white border border-line shadow-[0_10px_40px_rgb(0,0,0,0.03)] rounded-5xl;
   }
   
   .bento-grid {
-    @apply grid grid-cols-2 gap-4;
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-8;
   }
   
   .bento-item {
-    @apply bg-white/50 backdrop-blur-sm p-5 rounded-[28px] border border-white/60 shadow-sm transition-all hover:shadow-md hover:bg-white/80;
+    @apply bg-white p-10 rounded-4xl border border-line shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-all hover:shadow-[0_15px_50px_rgb(0,0,0,0.08)] hover:-translate-y-1.5;
   }
 
   .input-field {
-    @apply w-full bg-white/50 border-2 border-transparent focus:border-accent/20 focus:bg-white rounded-[24px] py-4 px-6 focus:ring-0 transition-all text-sm font-bold placeholder:text-[#C4BCB5] placeholder:font-normal;
+    @apply w-full bg-slate-50 border-2 border-transparent focus:border-accent focus:bg-white focus:ring-8 focus:ring-accent/5 rounded-3xl py-5 px-8 transition-all text-lg font-semibold placeholder:text-slate-400 outline-none;
   }
 
   .btn-primary {
-    @apply bg-accent text-white px-6 py-3.5 rounded-[24px] font-bold shadow-lg shadow-accent/20 active:scale-95 transition-all hover:brightness-105;
+    @apply bg-accent text-white px-10 py-5 rounded-3xl font-black shadow-[0_8px_20px_rgba(37,99,235,0.2)] active:scale-95 transition-all hover:bg-accent/90 hover:shadow-[0_12px_30px_rgba(37,99,235,0.3)] text-base uppercase tracking-widest;
   }
 
   .btn-secondary {
-    @apply bg-white/80 backdrop-blur-sm text-ink px-6 py-3.5 rounded-[24px] font-bold border border-line shadow-sm active:scale-95 transition-all hover:bg-white;
+    @apply bg-white text-ink px-10 py-5 rounded-3xl font-black border-2 border-line shadow-sm active:scale-95 transition-all hover:bg-slate-50 hover:border-slate-300 text-base uppercase tracking-widest;
+  }
+
+  .section-label {
+    @apply text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-6 block;
   }
 }
