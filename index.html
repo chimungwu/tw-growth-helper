@@ -58,6 +58,20 @@
       gtag('js', new Date());
       gtag('config', 'G-1TCWMZ52LN');
     </script>
+    <script>
+      // 自癒：把任何 scope 不等於 /tw-growth-helper/ 的舊 Service Worker 取消註冊，
+      // 避免手機端卡在過期的快取版本。新的 SW 會由 vite-plugin-pwa 正確註冊。
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) {
+            var scope = reg.scope || '';
+            if (scope.indexOf('/tw-growth-helper/') === -1) {
+              reg.unregister();
+            }
+          });
+        }).catch(function () { /* 忽略，避免影響主流程 */ });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
