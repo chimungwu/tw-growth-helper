@@ -88,10 +88,17 @@ export function findClosestIndices(value: number, array: number[]): [number, num
 }
 
 export function calculateBMI(weight: number, height: number): number {
+  // 防呆：身高/體重缺值或 <= 0 時不計算，回傳 NaN 由呼叫端判斷
+  if (!isFinite(weight) || !isFinite(height) || weight <= 0 || height <= 0) {
+    return NaN;
+  }
   return parseFloat((weight / Math.pow(height / 100, 2)).toFixed(2));
 }
 
 export function determineWeightCategory(bmi: number, age: number, gender: 'boy' | 'girl'): string {
+  // 防呆：BMI/年齡無效時直接回傳「無法判斷」，避免 NaN 比較落入「肥胖」分支
+  if (!isFinite(bmi) || !isFinite(age) || bmi <= 0 || age < 0) return "無法判斷";
+
   const bmiData = gender === "boy" ? boyBMIData : girlBMIData;
   const ages = bmiData["Age"];
   const underweight = bmiData["underweight"];

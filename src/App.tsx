@@ -597,7 +597,22 @@ const correctedAgeData = useMemo(() => {
 
   const gestationalAgeInWeeks = weeks + daysInput / 7;
   const prematureWeeks = 40 - gestationalAgeInWeeks;
-  const correctedYears = Math.max(0, ageData.years - prematureWeeks / 52.1775);
+  const rawCorrectedYears = ageData.years - prematureWeeks / 52.1775;
+
+  // 防呆：矯正年齡為負數（孩子的實際年齡 < 早產週數），代表「依預產期計算尚未滿月」
+  // 此時無法套用標準生長曲線，需明確告知家長
+  if (rawCorrectedYears < 0) {
+    return {
+      isError: true,
+      errorMessage: `依預產期計算，孩子尚未達到「足月出生」對應的時間點（提早 ${prematureWeeks.toFixed(1)} 週，實際年齡僅 ${ageData.display}）。此階段無法套用標準生長曲線，建議由新生兒科醫師依個別狀況評估。`,
+      years: rawCorrectedYears,
+      display: '尚未達矯正起點',
+      prematureWeeks,
+      gestationalAgeInWeeks,
+    } as const;
+  }
+
+  const correctedYears = Math.max(0, rawCorrectedYears);
 
   const years = Math.floor(correctedYears);
   const monthsFloat = (correctedYears - years) * 12;
@@ -612,6 +627,7 @@ const correctedAgeData = useMemo(() => {
         : `${days} 天`;
 
   return {
+    isError: false as const,
     years: correctedYears,
     display,
     prematureWeeks,
@@ -620,7 +636,9 @@ const correctedAgeData = useMemo(() => {
 }, [ageData, isPreterm, gestationalWeeks, gestationalDays]);
 
 const ageForCalculation = useMemo(() => {
-  return correctedAgeData?.years ?? ageData?.years ?? null;
+  // 若矯正年齡異常（負值），不帶入計算，改用實際年齡（並於 UI 顯示錯誤訊息）
+  if (correctedAgeData && !correctedAgeData.isError) return correctedAgeData.years;
+  return ageData?.years ?? null;
 }, [correctedAgeData, ageData]);
   
 // Derived state: Percentiles and Results
@@ -642,6 +660,11 @@ if (
     // 用 debouncedWeight 保持與上面 gate 一致，避免 weight 剛被清空但 debouncedWeight 還沒更新時 parseFloat('') → NaN
     const w = parseFloat(debouncedWeight);
     const age = ageForCalculation;
+
+    // 防呆：身高/體重/年齡需為合理正數，否則所有計算都不具意義
+    if (!isFinite(h) || !isFinite(w) || h <= 0 || w <= 0 || age < 0) {
+      return null;
+    }
     const hData = gender === 'boy' ? boyHeightData : girlHeightData;
     const wData = gender === 'boy' ? boyWeightData : girlWeightData;
 
@@ -853,7 +876,7 @@ const copyResults = () => {
   
   // --- ✅ 修正：年齡摘要邏輯 ---
   let ageSummary = `年齡：${ageData.display}`;
-  if (isPreterm && correctedAgeData) {
+  if (isPreterm && correctedAgeData && !correctedAgeData.isError) {
     // 這裡把「實際、矯正、註解」通通包起來
     ageSummary = `實際年齡：${ageData.display}\n矯正年齡：${correctedAgeData.display} (${gestationalWeeks}週${gestationalDays || 0}天)\n(註：本次生長評估採用「矯正年齡」計算)`;
   }
@@ -916,7 +939,7 @@ ${pahText}
     
     // --- 關鍵優化：動態判斷早產欄位 ---
     // 如果沒勾選，這些格子就給空白，維持表格整潔
-    const correctedAgeStr = (isPreterm && correctedAgeData) ? `"${correctedAgeData.display}"` : '';
+    const correctedAgeStr = (isPreterm && correctedAgeData && !correctedAgeData.isError) ? `"${correctedAgeData.display}"` : '';
     const pretermInfo = isPreterm ? `${gestationalWeeks}週${gestationalDays || 0}天` : '足月';
     const calculationBasis = isPreterm ? '矯正年齡' : '實際年齡';
 
@@ -1258,9 +1281,9 @@ const qaData = [
                     <div className="absolute left-8 top-1/2 -translate-y-1/2 text-accent group-focus-within:scale-125 transition-transform">
                       <Calendar size={24} />
                     </div>
-<input 
+<input
     type="text"
-    inputMode="decimal"
+    inputMode="numeric"
     placeholder="1020520 or 20130520 or 12"
     value={birthdateInput}
     onChange={(e) => setBirthdateInput(e.target.value)}
@@ -1321,6 +1344,7 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
         <div className="grid grid-cols-2 gap-4">
           <input
             type="number"
+            inputMode="numeric"
             min="20"
             max="36"
             step="1"
@@ -1341,6 +1365,7 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
 
           <input
             type="number"
+            inputMode="numeric"
             min="0"
             max="6"
             step="1"
@@ -1705,7 +1730,7 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
                     <div className="relative z-10 space-y-10">
                       
   {/* ✅ 插在這裡 */}
-{isPreterm && ageData && !ageData.isError && correctedAgeData && (
+{isPreterm && ageData && !ageData.isError && correctedAgeData && !correctedAgeData.isError && (
   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
     <div className="text-sm text-slate-700">
       <span className="font-bold">實際年齡：</span>
@@ -1718,6 +1743,20 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
     <div className="text-sm text-slate-700">
       <span className="font-bold">本次評估採用：</span>
       矯正年齡
+    </div>
+  </div>
+)}
+
+{isPreterm && ageData && !ageData.isError && correctedAgeData && correctedAgeData.isError && (
+  <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 space-y-2">
+    <div className="flex items-start gap-2">
+      <span className="text-amber-600 font-black text-sm shrink-0">⚠ 矯正年齡無法計算</span>
+    </div>
+    <div className="text-sm text-amber-900 leading-relaxed whitespace-pre-line">
+      {correctedAgeData.errorMessage}
+    </div>
+    <div className="text-xs text-amber-700 pt-1">
+      本次生長評估暫以「實際年齡」計算，結果僅供參考。
     </div>
   </div>
 )}
@@ -1744,7 +1783,7 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
       </p>
 
       <p className="text-[1.55rem] sm:text-2xl font-black text-slate-600 mt-1 tracking-tight">
-        {isPreterm && correctedAgeData
+        {isPreterm && correctedAgeData && !correctedAgeData.isError
           ? `${correctedAgeData.display}（矯正）`
           : ageData?.display}
       </p>
@@ -2065,7 +2104,7 @@ const summaryRows = [
   `姓名：${displayName} (${genderLabel})`,
   `實際年齡：${ageData.display}`, // 👈 建議保留實際年齡作為對照
   // 如果是早產兒，多塞兩行
-  ...(isPreterm && correctedAgeData ? [
+  ...(isPreterm && correctedAgeData && !correctedAgeData.isError ? [
     `矯正年齡：${correctedAgeData.display} (${gestationalWeeks}週${gestationalDays || 0}天)`,
     `評估基準：⚠️ 採用「矯正年齡」計算` // 加上一個 Emoji 提醒家長
   ] : []),
