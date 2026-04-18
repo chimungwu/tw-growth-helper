@@ -178,11 +178,6 @@ export function calculateBoneAgeDeviation(predictedHeight: number | null, inheri
   if (predictedHeight > inheritedMax) return 'high';
   if (predictedHeight < inheritedMin - 5) return 'extreme_low';
   if (predictedHeight < inheritedMin) return 'low';
-  
-  return 'normal';
-}
-  if (predictedHeight < inheritedMin - 5) return 'extreme_low';
-  if (predictedHeight < inheritedMin) return 'low';
-  
+
   return 'normal';
 }
