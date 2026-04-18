@@ -2322,5 +2322,56 @@ const summaryRows = [
                             whileTap={{ scale: 0.98 }}
                             href={item.link} 
                             target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center g
+                            className="inline-flex items-center gap-2 bg-accent text-white px-5 py-2.5 rounded-2xl font-black shadow-xl shadow-accent/20 transition-all text-[11px] uppercase tracking-widest"
+                          >
+                            {item.linkText}
+                            <ExternalLink size={12} />
+                          </motion.a>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white/90 backdrop-blur-3xl border-t border-slate-100 py-4 px-6 fixed bottom-0 left-0 right-0 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <motion.div 
+              whileHover={{ rotate: 10, scale: 1.1 }}
+              className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-xl transition-all ${gender === 'boy' ? 'bg-boy shadow-boy/20' : 'bg-girl shadow-girl/20'}`}
+            >
+              <Heart className="text-white" size={20} fill="currentColor" />
+            </motion.div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-black text-ink tracking-tight leading-none font-display">
+                  兒童成長小幫手
+                </h1>
+                <span className="text-[9px] font-black bg-accent/10 text-accent px-1.5 py-0.5 rounded-md uppercase tracking-widest">v3.0</span>
+              </div>
+              <p className="text-xs text-slate-400 font-bold mt-0.5">專業、精確的成長評估工具</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <a 
+              href="https://drwu.carrd.co" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs font-black text-accent hover:opacity-70 transition-opacity bg-accent/5 px-4 py-2 rounded-xl"
+            >
+              <User size={16} fill="currentColor" />
+              <span>仨寶爸中醫博士吳啓銘</span>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
