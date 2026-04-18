@@ -87,16 +87,6 @@ export function findClosestIndices(value: number, array: number[]): [number, num
   return [clampedHigh, clampedLow];
 }
 
-export function findBoundingValues(value: number, dataset: Record<string, number>): [string, string] {
-  let percentiles = Object.keys(dataset).filter(k => k !== 'Age');
-  for (let i = 1; i < percentiles.length; i++) {
-    if (dataset[percentiles[i]] >= value) {
-      return [percentiles[i - 1], percentiles[i]];
-    }
-  }
-  return [percentiles[percentiles.length - 2], percentiles[percentiles.length - 1]];
-}
-
 export function calculateBMI(weight: number, height: number): number {
   return parseFloat((weight / Math.pow(height / 100, 2)).toFixed(2));
 }

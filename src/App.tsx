@@ -667,8 +667,11 @@ const getInterpolatedP = (data: any, val: number) => {
     // 比 3rd 還小：從 0 到 3 內插
     percentile = interpolateValue(val, 0, pValuesAtAge[0], 0, 3);
   } else if (val > pValuesAtAge[6]) {
-    // 比 97th 還大：從 97 到 100 內插
-    percentile = interpolateValue(val, pValuesAtAge[6], pValuesAtAge[6] * 1.2, 97, 100);
+    // 比 97th 還大：沿用 p85→p97 的同等斜率外推到 100
+    // （與 calculations.ts 的 calculatePercentileFromValue 邏輯一致）
+    const p85Val = pValuesAtAge[5];
+    const p97Val = pValuesAtAge[6];
+    percentile = interpolateValue(val, p97Val, p97Val + (p97Val - p85Val), 97, 100);
   } else {
     // 落在七條線之間：找出到底是哪一段，精確內插
     for (let i = 0; i < pValuesAtAge.length - 1; i++) {
