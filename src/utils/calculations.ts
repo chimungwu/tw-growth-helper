@@ -77,7 +77,14 @@ export function findClosestIndices(value: number, array: number[]): [number, num
       return [midIndex, midIndex];
     }
   }
-  return [highIndex, lowIndex];
+
+  // Clamp to valid range so interpolation doesn't produce NaN for out-of-range inputs.
+  // - value < array[0]  (e.g. 校正後負年齡): highIndex=-1, lowIndex=0  → [0, 0]
+  // - value > array[-1] (超過資料表年齡上限): highIndex=N-1, lowIndex=N → [N-1, N-1]
+  const lastIndex = array.length - 1;
+  const clampedHigh = Math.max(0, Math.min(highIndex, lastIndex));
+  const clampedLow = Math.max(0, Math.min(lowIndex, lastIndex));
+  return [clampedHigh, clampedLow];
 }
 
 export function findBoundingValues(value: number, dataset: Record<string, number>): [string, string] {
@@ -161,12 +168,13 @@ export function calculatePercentileFromValue(val: number, dataAtAge: Record<stri
 export type GrowthQuadrant = 'slow' | 'fast' | null;
 
 export function checkGrowthQuadrant(gender: 'boy' | 'girl', age: number, heightPercentile: number): GrowthQuadrant {
+  // 門檻改成 >= / <=，讓剛好落在 11.0（男）/ 9.0（女）的孩子不會掉進空窗
   if (gender === 'boy') {
-    if (heightPercentile < 15 && age > 11) return 'slow';
-    if (heightPercentile > 85 && age < 11) return 'fast';
+    if (heightPercentile < 15 && age >= 11) return 'slow';
+    if (heightPercentile > 85 && age <= 11) return 'fast';
   } else {
-    if (heightPercentile < 15 && age > 9) return 'slow';
-    if (heightPercentile > 85 && age < 9) return 'fast';
+    if (heightPercentile < 15 && age >= 9) return 'slow';
+    if (heightPercentile > 85 && age <= 9) return 'fast';
   }
   return null;
 }

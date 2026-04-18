@@ -639,7 +639,8 @@ if (
 }
 
     const h = parseFloat(height);
-    const w = parseFloat(weight);
+    // 用 debouncedWeight 保持與上面 gate 一致，避免 weight 剛被清空但 debouncedWeight 還沒更新時 parseFloat('') → NaN
+    const w = parseFloat(debouncedWeight);
     const age = ageForCalculation;
     const hData = gender === 'boy' ? boyHeightData : girlHeightData;
     const wData = gender === 'boy' ? boyWeightData : girlWeightData;
@@ -774,7 +775,7 @@ const getInterpolatedP = (data: any, val: number) => {
       boneAgeDeviation,
       usedMaturity
     };
-  }, [ageForCalculation, ageData, height, weight, gender, fatherHeight, motherHeight, boneAge, manualMaturity, tannerStage, isCalculating]);
+  }, [ageForCalculation, ageData, height, debouncedWeight, gender, fatherHeight, motherHeight, boneAge, manualMaturity, tannerStage, isCalculating]);
 
 
   const inherited = useMemo(() => {
