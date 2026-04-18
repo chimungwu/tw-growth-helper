@@ -230,15 +230,15 @@ const openAdvice = (type: keyof typeof ADVICE_TEXTS, title: string) => {
     
     return (
       <div className="space-y-1">
-        <div className="relative pt-2 pb-8">
+        <div className="relative pt-2 pb-12 sm:pb-14">
           <div className="h-2 w-full bg-slate-100 rounded-full relative border border-slate-200/50">
             {/* Reference markers lines */}
             {markers.map(m => (
               <div key={m} className="absolute top-0 h-full w-px bg-slate-300/50" style={{ left: `${m}%` }} />
             ))}
-            
+
             {/* Result Dot */}
-            <motion.div 
+            <motion.div
               initial={{ left: 0, opacity: 0 }}
               animate={{ left: `${Math.min(Math.max(percentile, 0), 100)}%`, opacity: 1 }}
               transition={{ duration: 1.5, ease: "easeOut" }}
@@ -252,8 +252,8 @@ const openAdvice = (type: keyof typeof ADVICE_TEXTS, title: string) => {
                 <div className="h-1.5 w-px bg-slate-300 mb-1" />
                 <span className="text-[8px] font-bold text-slate-400">{`P${m}`}</span>
                 {m === 50 && medianValue && (
-                  <span className="text-[9px] font-black text-slate-600 mt-1 whitespace-nowrap bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200">
-                    {medianValue.toFixed(1)} {unit}
+                  <span className="text-sm sm:text-base font-black text-slate-800 mt-1.5 whitespace-nowrap bg-white px-2.5 py-1 rounded-lg border border-slate-300 shadow-sm">
+                    {medianValue.toFixed(1)} <span className="text-[10px] sm:text-xs font-bold text-slate-500">{unit}</span>
                   </span>
                 )}
               </div>
