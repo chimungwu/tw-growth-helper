@@ -27,16 +27,16 @@ interface Props {
   onZoom?: () => void;
 }
 
-const PERCENTILE_KEYS: PercentileKey[] = [' 3rd', '15th', '25th', '50th', '75th', '85th', '97th'];
-const PERCENTILE_LABELS = ['P3', 'P15', 'P25', 'P50', 'P75', 'P85', 'P97'];
+const PERCENTILE_KEYS: PercentileKey[] = [' 3rd', '15th', '50th', '85th', '97th'];
+const PERCENTILE_LABELS = ['P3', 'P15', 'P50', 'P85', 'P97'];
 const LINE_COLORS: Record<PercentileKey, string> = {
-  ' 3rd': '#ef4444',  // 紅
-  '15th': '#f59e0b',  // 琥珀
-  '25th': '#84cc16',  // 黃綠
+  ' 3rd': '#ef4444',  // 紅（極端低）
+  '15th': '#f59e0b',  // 琥珀（偏低）
+  '25th': '#84cc16',  // 黃綠（不顯示，保留型別完整）
   '50th': '#22c55e',  // 綠（中位數，粗線）
-  '75th': '#84cc16',
-  '85th': '#f59e0b',
-  '97th': '#ef4444',
+  '75th': '#84cc16',  // 黃綠（不顯示，保留型別完整）
+  '85th': '#f59e0b',  // 琥珀（偏高）
+  '97th': '#ef4444',  // 紅（極端高）
 };
 
 export function GrowthCurveChart({ data, age, value, gender, metric, size = 'small', onZoom }: Props) {

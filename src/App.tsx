@@ -102,7 +102,7 @@ export default function App() {
                 size="large"
               />
               <p className="mt-6 text-xs sm:text-sm text-slate-500 text-center leading-relaxed">
-                ● 曲線由下而上為 P3 / P15 / P25 / P50 / P75 / P85 / P97　·　大圓點為孩子目前的位置
+                ● 曲線由下而上為 P3 / P15 / P50 / P85 / P97　·　大圓點為孩子目前的位置
                 <br />
                 資料來源：WHO（0–5 歲）、陳偉德醫師 2010 年台灣兒少生長新曲線（7–18 歲）
               </p>
@@ -1998,7 +1998,7 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
                             />
                           </div>
                           <p className="text-[10px] sm:text-xs text-slate-500 text-center leading-relaxed">
-                            曲線由下而上為 P3 / P15 / P25 / P50 / P75 / P85 / P97　·　大圓點為孩子目前的位置
+                            曲線由下而上為 P3 / P15 / P50 / P85 / P97　·　大圓點為孩子目前的位置
                           </p>
                         </div>
                       )}
