@@ -26,6 +26,7 @@ import {
   type MaturityCategory
 } from './utils/calculations';
 import { Modal } from './components/Modal';
+import { GrowthCurveChart } from './components/GrowthCurveChart';
 
 type Gender = 'boy' | 'girl';
 type TannerStage = 0 | 1 | 2 | 3;
@@ -58,6 +59,60 @@ const ADVICE_TEXTS = {
 };
 
 export default function App() {
+  // === 放大模式：由主畫面「放大」按鈕開新分頁帶參數進來 ===
+  // 範例：?chart=height&age=8.5&value=130&gender=boy
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const chartType = params.get('chart');
+    if (chartType === 'height' || chartType === 'weight') {
+      const fsAge = parseFloat(params.get('age') || '');
+      const fsValue = parseFloat(params.get('value') || '');
+      const fsGender: Gender = params.get('gender') === 'girl' ? 'girl' : 'boy';
+      const fsData =
+        chartType === 'height'
+          ? fsGender === 'boy' ? boyHeightData : girlHeightData
+          : fsGender === 'boy' ? boyWeightData : girlWeightData;
+
+      if (isFinite(fsAge) && isFinite(fsValue) && fsAge >= 0 && fsValue > 0) {
+        return (
+          <div className="min-h-screen bg-bg p-3 sm:p-8 flex items-center justify-center">
+            <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl p-5 sm:p-10">
+              <div className="flex items-center justify-between mb-4 sm:mb-6 pb-4 border-b border-slate-100">
+                <div>
+                  <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
+                    {chartType === 'height' ? '身高' : '體重'}成長曲線
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-500 font-bold mt-1">
+                    {fsGender === 'boy' ? '男孩' : '女孩'}　·　{fsAge.toFixed(1)} 歲　·　{fsValue} {chartType === 'height' ? 'cm' : 'kg'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => window.close()}
+                  className="text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+                >
+                  關閉
+                </button>
+              </div>
+              <GrowthCurveChart
+                data={fsData}
+                age={fsAge}
+                value={fsValue}
+                gender={fsGender}
+                metric={chartType}
+                size="large"
+              />
+              <p className="mt-6 text-xs sm:text-sm text-slate-500 text-center leading-relaxed">
+                ● 曲線由下而上為 P3 / P15 / P25 / P50 / P75 / P85 / P97　·　大圓點為孩子目前的位置
+                <br />
+                資料來源：WHO（0–5 歲）、陳偉德醫師 2010 年台灣兒少生長新曲線（7–18 歲）
+              </p>
+            </div>
+          </div>
+        );
+      }
+    }
+  }
+
   const [gender, setGender] = useState<Gender>('boy');
   const [showTannerGuide, setShowTannerGuide] = useState(false);
   const [childName, setChildName] = useState<string>(''); 
@@ -1878,9 +1933,9 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
                               );
                             })()}
                             <div className="pt-2 text-left">
-                              <GrowthProgressBar 
-                                percentile={results.wRes.percentile} 
-                                color="bg-orange-500" 
+                              <GrowthProgressBar
+                                percentile={results.wRes.percentile}
+                                color="bg-orange-500"
                                 medianValue={results.wRes.p50}
                                 unit="kg"
                               />
@@ -1888,6 +1943,65 @@ className={`input-field pl-16 sm:pl-20 pr-6 sm:pr-10 text-base sm:text-lg transi
                           </div>
                         </div>
                       </div>
+
+                      {/* 生長曲線圖（身高 + 體重）*/}
+                      {ageForCalculation !== null && (
+                        <div className="bento-item p-4 sm:p-8 rounded-3xl sm:rounded-4xl space-y-6">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs sm:text-sm font-black text-slate-600 uppercase tracking-[0.2em]">
+                              生長曲線位置
+                            </p>
+                            <span className="text-[10px] sm:text-xs text-slate-400 font-bold">
+                              （孩子年齡 ±3 歲區間）
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+                            <GrowthCurveChart
+                              data={gender === 'boy' ? boyHeightData : girlHeightData}
+                              age={ageForCalculation}
+                              value={parseFloat(height)}
+                              gender={gender}
+                              metric="height"
+                              onZoom={() => {
+                                const params = new URLSearchParams({
+                                  chart: 'height',
+                                  age: ageForCalculation.toFixed(3),
+                                  value: height,
+                                  gender,
+                                });
+                                window.open(
+                                  `${window.location.pathname}?${params.toString()}`,
+                                  '_blank',
+                                  'noopener,noreferrer'
+                                );
+                              }}
+                            />
+                            <GrowthCurveChart
+                              data={gender === 'boy' ? boyWeightData : girlWeightData}
+                              age={ageForCalculation}
+                              value={parseFloat(debouncedWeight)}
+                              gender={gender}
+                              metric="weight"
+                              onZoom={() => {
+                                const params = new URLSearchParams({
+                                  chart: 'weight',
+                                  age: ageForCalculation.toFixed(3),
+                                  value: debouncedWeight,
+                                  gender,
+                                });
+                                window.open(
+                                  `${window.location.pathname}?${params.toString()}`,
+                                  '_blank',
+                                  'noopener,noreferrer'
+                                );
+                              }}
+                            />
+                          </div>
+                          <p className="text-[10px] sm:text-xs text-slate-500 text-center leading-relaxed">
+                            曲線由下而上為 P3 / P15 / P25 / P50 / P75 / P85 / P97　·　大圓點為孩子目前的位置
+                          </p>
+                        </div>
+                      )}
 
                       {/* Adult Prediction Card (Moved here) */}
                       {(inherited || results.boneAgePredictedHeight) && (
