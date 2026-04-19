@@ -133,7 +133,15 @@ export function GrowthCurveChart({ data, age, value, gender, metric, size = 'sma
   const dotColor = metric === 'height' ? genderColor : '#ea580c';
 
   const valueLabel = `${value} ${metric === 'height' ? 'cm' : 'kg'}`;
-  const ageLabel = `${age.toFixed(1)} 歲`;
+  // 年齡轉「幾歲幾個月」格式
+  const ageYears = Math.floor(age);
+  const ageMonths = Math.floor((age - ageYears) * 12);
+  const ageLabel =
+    ageYears > 0
+      ? ageMonths > 0
+        ? `${ageYears} 歲 ${ageMonths} 個月`
+        : `${ageYears} 歲`
+      : `${ageMonths} 個月`;
 
   // 是否在可視範圍內
   const dotInRange = age >= minAge && age <= maxAge && value >= minY && value <= maxY;

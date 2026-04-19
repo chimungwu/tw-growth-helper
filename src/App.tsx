@@ -74,6 +74,16 @@ export default function App() {
           : fsGender === 'boy' ? boyWeightData : girlWeightData;
 
       if (isFinite(fsAge) && isFinite(fsValue) && fsAge >= 0 && fsValue > 0) {
+        // 把小數年齡轉成「幾歲幾個月」
+        const fsYears = Math.floor(fsAge);
+        const fsMonths = Math.floor((fsAge - fsYears) * 12);
+        const fsAgeLabel =
+          fsYears > 0
+            ? fsMonths > 0
+              ? `${fsYears} 歲 ${fsMonths} 個月`
+              : `${fsYears} 歲`
+            : `${fsMonths} 個月`;
+
         return (
           <div className="min-h-screen bg-bg p-3 sm:p-8 flex items-center justify-center">
             <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl p-5 sm:p-10">
@@ -83,7 +93,7 @@ export default function App() {
                     {chartType === 'height' ? '身高' : '體重'}成長曲線
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-500 font-bold mt-1">
-                    {fsGender === 'boy' ? '男孩' : '女孩'}　·　{fsAge.toFixed(1)} 歲　·　{fsValue} {chartType === 'height' ? 'cm' : 'kg'}
+                    {fsGender === 'boy' ? '男孩' : '女孩'}　·　{fsAgeLabel}　·　{fsValue} {chartType === 'height' ? 'cm' : 'kg'}
                   </p>
                 </div>
                 <button
