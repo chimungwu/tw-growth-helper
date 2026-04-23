@@ -1299,7 +1299,7 @@ const qaData = [
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Right Column (Desktop): Input Form & Desktop Q&A */}
-          <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-24 order-1 lg:order-2">
+          <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-2 desktop-scroll order-1 lg:order-2">
             {/* Input Form Section */}
             <div className="glass-card p-5 sm:p-10 space-y-6 sm:space-y-10">
               {/* Gender Selection */}
